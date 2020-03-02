@@ -1,0 +1,39 @@
+[alias]
+	ap = add -p
+	au = add -u
+	br = branch
+	ci = commit -v
+	co = checkout
+	cp = cherry-pick
+	dc = diff --cached
+	dt = difftool
+	ed = !vim $(git status -s | awk '{print $2}')
+	lb = for-each-ref --sort=committerdate refs/heads/ --format='%(committerdate:short) %(refname:short)'
+	lg = "!f() { \
+			  git log \
+				  --graph \
+				  --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr)%Creset' \
+				  --abbrev-commit \
+				  --date=relative \
+				  ${1:--5}; \
+		  }; f"
+	ls = log --graph --decorate --pretty=oneline --abbrev-commit
+	pf = push --force-with-lease
+	sl = stash list --date=local
+	sp = "!f() { git stash pop stash@{${1:-0}} ; }; f"
+	ss = "!f() { git stash show stash@{${1:-0}} ; }; f"
+	st = status
+	sh = show --name-status --pretty=short --abbrev-commit
+[core]
+	editor = vim
+	excludesFile = ~/.gitignore
+[diff]
+	tool = vimdiff
+[difftool]
+	prompt = false
+[fetch]
+	prune = true
+[include]
+	path = ~/.gitconfig.local
+[rebase]
+	autosquash = true

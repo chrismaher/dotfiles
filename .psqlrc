@@ -1,0 +1,21 @@
+\set QUIET 1
+
+\set PROMPT1 '%[%033[1;33m%]%n@%/%R%[%033[0m%]%# '
+\set PROMPT2 '%[%33[m%]%n@%/%R%[%033[0m%]%# '
+
+\pset null '¤'
+\pset linestyle unicode
+
+\set COMP_KEYWORD_CASE upper
+
+\timing
+
+\x auto
+
+\set HISTCONTROL ignoredups
+\set HISTFILE ~/.psql_history- :DBNAME
+
+\unset QUIET
+
+-- read additional psql variables
+\i ~/.psql.local
