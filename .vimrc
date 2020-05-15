@@ -18,26 +18,36 @@ set backspace=indent,eol,start
 
 " disable error bells
 set noerrorbells
+set vb t_vb=
 
 set pastetoggle=<leader>pt"}}}
 
 " Plugins{{{
+" use Pathogen to ensure local plugins are in runtimepath
+call pathogen#infect()
+
+"
 call plug#begin('~/.vim/plugged')
 
 Plug 'preservim/nerdtree'
-Plug 'preservim/nerdcommenter'
+Plug 'preservim/nerdcommenter', { 'on': [] }
 
 Plug 'tpope/vim-fugitive'
-Plug 'tpope/vim-unimpaired'
+Plug 'tpope/vim-unimpaired', { 'on': [] }
+Plug 'tpope/vim-dispatch', { 'on': [] }
 
-Plug 'vim-airline/vim-airline'
+Plug 'vim-airline/vim-airline', { 'on': [] }
 
 Plug 'nvie/vim-flake8', { 'for': 'python' }
 Plug 'fatih/vim-go', { 'for': 'go' }
 
 Plug 'christoomey/vim-tmux-navigator'
 
-Plug 'junegunn/vader.vim'
+Plug 'ctrlpvim/ctrlp.vim'
+
+Plug 'dense-analysis/ale', { 'for': 'haskell' }
+
+Plug 'junegunn/vader.vim', { 'on': [] }
 
 " disable for now
 Plug 'airblade/vim-gitgutter', { 'on': [] }
@@ -51,7 +61,19 @@ function! TrimWhitespace()
     let l:save = winsaveview()
     keeppatterns %s/\s\+$//e
     call winrestview(l:save)
-endfun"}}}
+endfun
+
+function! ToggleInteractiveShell()
+    " toggle to make vim’s :! shell
+    " behave like interactive shell
+    let l:flag = &shellcmdflag
+    if l:flag ==# '-c'
+        set shellcmdflag=-ic
+    elseif l:flag ==# '-ic'
+        set shellcmdflag=-c
+    endif
+    echom 'shellcmdflag=' . &shellcmdflag
+endfunction"}}}
 
 " Mappings{{{
 " leaders
@@ -78,6 +100,9 @@ noremap <leader>z :wa <bar> :qa <cr>
 nnoremap <leader>" viw<esc>a"<esc>bi"<esc>lel
 nnoremap <leader>' viw<esc>a'<esc>bi'<esc>lel
 
+" add escape without entering insert mode
+nnoremap <leader>\ i\\<esc>
+
 " plugin-related mappings{{{
 
 " Nerdtree
@@ -99,7 +124,10 @@ noremap <leader>bn :bn<cr>
 " visually select pasted text
 nnoremap gp `[v`]
 
+nnoremap <leader>rt :%retab<cr>
+
 noremap <leader>tw :call TrimWhitespace()<cr>
+noremap <silent> <leader>ti :call ToggleInteractiveShell()<cr>
 
 " inoremap <C-o> <esc>O}}}
 
@@ -111,9 +139,45 @@ if has("autocmd")
     " Go{{{
     augroup filetype_go
         autocmd!
+
         autocmd FileType go setlocal autowrite ts=8 sts=8 sw=8 noet
-        autocmd FileType go nmap <leader>b  <Plug>(go-build)
-        autocmd FileType go nmap <leader>r  <Plug>(go-run)
+
+        let g:go_list_type = "quickfix"
+        " 10 seconds it the default, but it can be adjusted
+        " with g:go_test_timeout as necessary
+        let g:go_test_timeout = '10s'
+        let g:go_fmt_command = "goimports"
+        " this setting controls whether doc strings are selected
+        " with af motion
+        let g:go_textobj_include_function_doc = 1
+
+        " the default
+        " let g:go_metalinter_enabled = ['vet', 'golint', 'errcheck']
+        " let g:go_metalinter_autosave = 1
+        " let g:go_metalinter_autosave_enabled = ['vet', 'golint']
+        " let g:go_metalinter_deadline = \"5s\"
+
+        " run :GoBuild or :GoTestCompile based on the go file
+        function! s:build_go_files()
+          let l:file = expand('%')
+          if l:file =~# '^\f\+_test\.go$'
+            call go#test#Test(0, 1)
+          elseif l:file =~# '^\f\+\.go$'
+            call go#cmd#Build(0)
+          endif
+        endfunction
+
+        autocmd FileType go nmap <leader>b :<C-u>call <SID>build_go_files()<CR>
+        autocmd FileType go nmap <leader>r <Plug>(go-run)
+        autocmd FileType go nmap <leader>t <Plug>(go-test)
+        autocmd FileType go nmap <leader>c <Plug>(go-coverage-toggle)
+        autocmd FileType go nmap <leader>i <Plug>(go-info)
+
+        autocmd Filetype go command! -bang A call go#alternate#Switch(<bang>0, 'edit')
+        autocmd Filetype go command! -bang AV call go#alternate#Switch(<bang>0, 'vsplit')
+        autocmd Filetype go command! -bang AS call go#alternate#Switch(<bang>0, 'split')
+        autocmd Filetype go command! -bang AT call go#alternate#Switch(<bang>0, 'tabe')
+
     augroup END"}}}
 
     " Haskell{{{
@@ -156,6 +220,6 @@ if has("autocmd")
     " YAML{{{
     augroup filetype_yaml
         autocmd!
-        autocmd FileType yaml setlocal foldmethod=indent ts=2 sts=2 sw=2 et
+        autocmd FileType yaml setlocal ts=4 sts=4 sw=4 et
     augroup End"}}}
 endif"}}}

@@ -60,7 +60,7 @@ alias ....="cd ../../.."
 alias cores="sysctl -n hw.ncpu"
 alias lsd="ls -1d */"
 alias lsr="ls -ltr"
-alias lss="ls -lShr"
+alias lsh="ls -lShr"
 alias mvi="mv -i"
 
 alias bashrc='vim $HOME/.bashrc'
@@ -86,20 +86,59 @@ alias getsleep="sudo systemsetup -getcomputersleep"
 # Functions
 # ------------------------------------------------------------
 
+body () {
+    IFS= read -r header
+    printf '%s\n' "$header"
+    "$@"
+}
+
 # recursive search for name containing
 findn () { find . -name \*${1}\* ; }
 
 # recursive search for file containing
 greprl () { grep -rl "$1" . ; }
 
+# recursive search, filtered by file extention
+greprli () { grep -rl --include \*.${1} "$2" . ; }
+
+# recursive search, filtered by file extention
+greprlx () { grep -rl --exclude-dir \*.${1} "$2" . ; }
+
+last_command () {
+    fc -ln "$1" "$1" | sed '1s/^[[:space:]]*//' | tr -d '\n' | pbcopy
+}
+
 # ls "glob" or "grep"
 lsg () { ls -dltr *${1}* ; }
 
 mcd () { mkdir -p "$1" && cd "$1" ; }
 
-pasteto () { pbpaste > "$1" ; }
+# paste from system clipboard to file, with "-a" (append) and "-o" (overwrite) switches
+pasteto () {
+    if [ $# -eq 1 ]; then
+        if [ ! -f "$1" ]; then
+            pbpaste > "$1"
+        else
+            echo "$1 already exists. Use switch \"-a\" to append or \"-o" to overwrite""
+            exit 1
+        fi
+    elif [ $# -eq 2 ]; then
+        case "$1" in
+            "-a")
+                pbpaste >> "$2" ;;
+            "-o")
+                pbpaste > "$2" ;;
+        esac
+    else
+        echo "Could not parse arguments."
+        exit 1
+    fi
+}
 
 resource () { source "$bashrc" ; }
+
+# show hidden files and directories
+show_hidden () { find . -maxdepth 1 -name \.\* -print | sort ; }
 
 targz () { tar -zcvf "${1}.tar.gz" "$1" ; }
 
@@ -107,14 +146,4 @@ untargz () {
     target="${2:-$(pwd)}"
     [ -d "$target" ] || mkdir -p "$target"
     tar -zxvf "$1" -C "$target"
-}
-
-last_command () {
-    fc -ln "$1" "$1" | sed '1s/^[[:space:]]*//' | tr -d '\n' | pbcopy
-}
-
-body () {
-    IFS= read -r header
-    printf '%s\n' "$header"
-    "$@"
 }

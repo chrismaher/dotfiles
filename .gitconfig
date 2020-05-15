@@ -2,11 +2,13 @@
 	ap = add -p
 	au = add -u
 	br = branch
+	cb = checkout -b
 	ci = commit -v
 	co = checkout
 	cp = cherry-pick
 	dc = diff --cached
 	dt = difftool
+	dw = diff -w
 	ed = !vim $(git status -s | awk '{print $2}')
 	lb = for-each-ref --sort=committerdate refs/heads/ --format='%(committerdate:short) %(refname:short)'
 	lg = "!f() { \
@@ -24,6 +26,7 @@
 	ss = "!f() { git stash show stash@{${1:-0}} ; }; f"
 	st = status
 	sh = show --name-status --pretty=short --abbrev-commit
+	um = "!git ls-files -u | cut -f 2 | sort -u" # git diff --name-only --diff-filter=U
 [core]
 	editor = vim
 	excludesFile = ~/.gitignore
