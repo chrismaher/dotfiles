@@ -5,8 +5,8 @@
 export PYTHONPATH="$HOME/bi"
 
 # For pyenv-virtualenv
-eval "$(pyenv init -)"
-eval "$(pyenv virtualenv-init -)"
+# eval "$(pyenv init -)"
+# eval "$(pyenv virtualenv-init -)"
 
 # AWS CLI
 export PATH=~/.local/bin:$PATH
@@ -24,6 +24,8 @@ export PATH="$PATH:$HOME/.rvm/bin"
 # Bash prompt
 export PS1='\T \w$(__git_ps1 " (%s)") \$ '
 
+# silence 'default interactive shell...' message
+export BASH_SILENCE_DEPRECATION_WARNING=1
 # Go
 export GOPATH="$HOME/go"
 export PATH="$PATH:$GOPATH/bin"
@@ -52,21 +54,28 @@ source "$HOME"/.git-prompt.sh
 # ------------------------------------------------------------
 
 # dotfile version control
-alias cfg='/usr/bin/git --git-dir=/Users/chrismaher/.cfg/ --work-tree=/Users/chrismaher'
+alias cfg="/usr/bin/git --git-dir=${HOME}/.cfg/ --work-tree=${HOME}"
 
 alias ..="cd .."
 alias ...="cd ../.."
 alias ....="cd ../../.."
+alias chx="chmod +x"
+alias cp="cp -i"
 alias cores="sysctl -n hw.ncpu"
+alias diff="/usr/local/Cellar/diffutils/3.7/bin/diff --color -u"
 alias lsd="ls -1d */"
 alias lsr="ls -ltr"
 alias lss="ls -lShr"
-alias mvi="mv -i"
+alias mv="mv -i"
+alias wcl="wc -l"
 
 alias bashrc='vim $HOME/.bashrc'
 alias gitconfig='vim $HOME/.gitconfig'
 alias psqlrc='vim $HOME/.psqlrc'
 alias vimrc='vim $HOME/.vimrc'
+
+# remove __pycache__ directories
+alias rmpyc='find . -type d -name '__pycache__' -exec rm -rf {} \;'
 
 # Sandbox virtualenv 
 alias venv='source $HOME/venv/bin/activate'
@@ -117,4 +126,8 @@ body () {
     IFS= read -r header
     printf '%s\n' "$header"
     "$@"
+}
+
+@@ () {
+    eval "$(echo "!!" | gsed 's/\w*$//')${@}"
 }

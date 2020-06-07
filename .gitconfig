@@ -2,6 +2,7 @@
 	ap = add -p
 	au = add -u
 	br = branch
+	cb = checkout -b
 	ci = commit -v
 	co = checkout
 	cp = cherry-pick
