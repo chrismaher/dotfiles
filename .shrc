@@ -1,0 +1,76 @@
+# Environment 
+# ------------------------------------------------------------
+
+# Go
+export GOPATH="$HOME/go"
+export PATH="$PATH:$GOPATH/bin"
+
+export EDITOR="$(which vim)"
+
+# Use vim bindings
+set -o vi
+
+export bashrc="$HOME/.bashrc"
+export zshrc="$HOME/.zshrc"
+export psqlrc="$HOME/.psqlrc"
+
+# Source external settings
+source "$HOME/.extras.sh";
+
+
+# Aliases
+# ------------------------------------------------------------
+
+# dotfile version control
+alias cfg="$(which git) --git-dir=${HOME}/.cfg/ --work-tree=${HOME}"
+
+alias ...="cd ../.."
+alias ....="cd ../../.."
+alias ack="ack --pager='less -R -X'"
+alias c="clear"
+alias chx"chmod +x"
+alias cp="cp -i"
+alias lsd="ls -1d */"
+alias lsr="ls -ltr"
+alias lss="ls -lShr"
+alias mv="mv -i"
+alias wcl="wc -l"
+
+alias bashrc='vim $HOME/.bashrc'
+alias gitconfig='vim $HOME/.gitconfig'
+alias psqlrc='vim $HOME/.psqlrc'
+alias vimrc='vim $HOME/.vimrc'
+alias zshrc='vim $HOME/.zshrc'
+
+# Python
+alias rmpyc='find . -type d -name '__pycache__' -exec rm -rf {} \;'
+alias venv='source $HOME/venv/bin/activate'
+
+alias vpaste="pbpaste | vim -"
+
+# tmux
+alias tat="tmux a -t"
+alias tns="tmux new -s"
+alias tls="tmux ls"
+
+alias lower="tr '[:upper:]' '[:lower:]'"
+alias upper="tr '[:lower:]' '[:upper:]'"
+
+
+# Functions
+# ------------------------------------------------------------
+
+mcd () { mkdir -p "$1" && cd "$1" ; }
+
+targz () { tar -zcvf "${1}.tar.gz" "$1" ; }
+
+untargz () {
+    target="${2:-$(pwd)}"
+    [ -d "$target" ] || mkdir -p "$target"
+    tar -zxvf "$1" -C "$target"
+}
+
+# LookML utils
+sql () {
+    gsed '/sql:/,/;;/!d;/;;/q' "$1" | gsed '1d; $d'
+}
