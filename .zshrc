@@ -1,4 +1,4 @@
-# Environment 
+# Environment
 # ------------------------------------------------------------
 
 setopt AUTO_CD
@@ -9,14 +9,13 @@ setopt INC_APPEND_HISTORY
 setopt HIST_IGNORE_DUPS
 setopt HIST_REDUCE_BLANKS
 
-fpath=(~/.zsh $fpath)
-zstyle ':completion:*:*:git:*' script ~/.zsh/git-completion.zsh
+# zstyle ':completion:*:*:git:*' script ~/.zsh/git-completion.sh
+# fpath=(~/.zsh $fpath)
 
-setopt prompt_subst
-. ~/.git-prompt.sh
-export RPROMPT=$'$(__git_ps1 "%s")'
-
-autoload -Uz compinit && compinit
+if type brew &>/dev/null; then
+    FPATH=$(brew --prefix)/share/zsh-completions:$FPATH
+    autoload -Uz compinit && compinit
+fi
 
 HISTFILE=${ZDOTDIR:-$HOME}/.zsh_history
 
@@ -25,22 +24,35 @@ HISTFILE=${ZDOTDIR:-$HOME}/.zsh_history
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
-PROMPT='%B%* %~%(?.%F{green}.%F{red}) →%b %f'
+# Load version control information
+autoload -Uz vcs_info
+precmd() { vcs_info }
 
-# function zle-line-init zle-keymap-select {
-#     RPS1="${${KEYMAP/vicmd/-- NORMAL --}/(main|viins)/-- INSERT --}"
-#     RPS2=$RPS1
-#     zle reset-prompt
-# }
-# zle -N zle-line-init
-# zle -N zle-keymap-select
+# Format the vcs_info_msg_0_ variable
+zstyle ':vcs_info:git:*' formats '%b'
+
+setopt PROMPT_SUBST
+
+PROMPT='%B%* %~%(?.%F{green}.%F{red}) →%b %f'
+export RPROMPT='%F{6}${vcs_info_msg_0_}'
 
 export MANPAGER="sh -c 'col -bx | bat -l man -p'"
 
+# added by Snowflake SnowSQL installer v1.2
+export PATH=/Applications/SnowSQL.app/Contents/MacOS:$PATH
+
 source "${HOME}/.shrc"
 
-# Aliases 
+# Aliases
 # ------------------------------------------------------------
 
 alias resource="source ${HOME}/.zshrc"
 alias cat='bat'
+
+# Functions
+# ------------------------------------------------------------
+
+# automatically ls with each cd
+autoload -U add-zsh-hook
+add-zsh-hook -Uz chpwd (){ ls; }
+export PATH="/usr/local/sbin:$PATH"
