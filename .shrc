@@ -17,7 +17,6 @@ export psqlrc="$HOME/.psqlrc"
 # Source external settings
 source "$HOME/.extras.sh";
 
-
 # Aliases
 # ------------------------------------------------------------
 
@@ -27,7 +26,7 @@ alias cfg="$(which git) --git-dir=${HOME}/.cfg/ --work-tree=${HOME}"
 alias ...="cd ../.."
 alias ....="cd ../../.."
 alias ack="ack --pager='less -R -X'"
-alias c="clear"
+alias cl="clear"
 alias chx"chmod +x"
 alias cp="cp -i"
 alias lsd="ls -1d */"
