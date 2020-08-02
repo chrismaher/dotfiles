@@ -59,6 +59,7 @@ alias cfg="/usr/bin/git --git-dir=${HOME}/.cfg/ --work-tree=${HOME}"
 alias ..="cd .."
 alias ...="cd ../.."
 alias ....="cd ../../.."
+alias ack="ack --pager='less -R -X'"
 alias chx="chmod +x"
 alias cp="cp -i"
 alias cores="sysctl -n hw.ncpu"
@@ -92,14 +93,33 @@ alias sleepon="sudo systemsetup -setcomputersleep 1"
 alias sleepoff="sudo systemsetup -setcomputersleep Never"
 alias getsleep="sudo systemsetup -getcomputersleep"
 
+alias lower="tr '[:upper:]' '[:lower:]'"
+alias upper="tr '[:lower:]' '[:upper:]'"
+
 # Functions
 # ------------------------------------------------------------
+
+body () {
+    IFS= read -r header
+    printf '%s\n' "$header"
+    "$@"
+}
 
 # recursive search for name containing
 findn () { find . -name \*${1}\* ; }
 
 # recursive search for file containing
 greprl () { grep -rl "$1" . ; }
+
+# recursive search, filtered by file extention
+greprli () { grep -rl --include \*.${1} "$2" . ; }
+
+# recursive search, filtered by file extention
+greprlx () { grep -rl --exclude-dir \*.${1} "$2" . ; }
+
+last_command () {
+    fc -ln "$1" "$1" | sed '1s/^[[:space:]]*//' | tr -d '\n' | pbcopy
+}
 
 # ls "glob" or "grep"
 lsg () { ls -dltr *${1}* ; }
@@ -109,6 +129,9 @@ mcd () { mkdir -p "$1" && cd "$1" ; }
 pasteto () { pbpaste > "$1" ; }
 
 resource () { source "$bashrc" ; }
+
+# show hidden files and directories
+show_hidden () { find . -maxdepth 1 -name \.\* -print | sort ; }
 
 targz () { tar -zcvf "${1}.tar.gz" "$1" ; }
 
@@ -130,4 +153,9 @@ body () {
 
 @@ () {
     eval "$(echo "!!" | gsed 's/\w*$//')${@}"
+}
+
+# LookML utils
+sql () {
+    gsed '/sql:/,/;;/!d;/;;/q' "$1" | gsed '1d; $d'
 }
