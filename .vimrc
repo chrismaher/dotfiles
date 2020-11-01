@@ -40,15 +40,25 @@ Plug 'christoomey/vim-tmux-navigator'
 Plug 'junegunn/vim-easy-align'
 Plug 'junegunn/vader.vim'
 Plug 'junegunn/gv.vim'
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+Plug 'junegunn/fzf.vim'
 
-" tabular is required for vim-markdown
-Plug 'godlygeek/tabular'
-Plug 'plasticboy/vim-markdown'
+" Plug 'ctrlpvim/ctrlp.vim'
+" Plug 'dense-analysis/ale', { 'for': 'haskell' }
+
+" Plug 'godlygeek/tabular'
+" Plug 'plasticboy/vim-markdown'
 
 Plug 'vimwiki/vimwiki', { 'branch': 'dev' }
 
-Plug 'chrismaher/vim-dbt'
-Plug 'chrismaher/vim-lookml'
+" Plug 'SirVer/ultisnips'
+
+" Plug 'mbbill/undotree'
+
+Plug 'mileszs/ack.vim'
+
+Plug 'git@github-personal:chrismaher/vim-dbt'
+Plug 'git@github-personal:chrismaher/vim-lookml.git'
 
 call plug#end()"}}}
 
@@ -140,9 +150,18 @@ noremap <leader>y "*y
 
 " map vim exits
 noremap <leader>w :w<cr>
-noremap <leader>q :qa<cr>
-noremap <leader>Q :qa!<cr>
-noremap <leader>z :wa <bar> :qa <cr>
+noremap <leader>q :q<cr>
+noremap <leader>qq :q!<cr>
+noremap <leader>qa :qa<cr>
+noremap <leader>qqa :qa!<cr>
+" noremap <leader>z :wa <bar> :qa<cr>
+
+" map tab operations
+nnoremap <silent> <leader>tn :tabnew<cr>
+nnoremap <silent> <leader>tc :tabclose<cr>
+nnoremap <silent> <leader>tf :tabfirst<cr>
+nnoremap <silent> <leader>tl :tablast<cr>
+" nnoremap <leader>tm :tabmove<space>
 
 nnoremap <leader>" viw<esc>a"<esc>bi"<esc>lel
 nnoremap <leader>' viw<esc>a'<esc>bi'<esc>lel
@@ -157,8 +176,16 @@ noremap <leader>bn :bn<cr>
 " visually select pasted text
 nnoremap gp `[v`]
 
-noremap <leader>tw :call TrimWhitespace()<cr>
+nnoremap <leader>rt :%retab<cr>
 
+noremap <leader>tw :call TrimWhitespace()<cr>
+noremap <silent> <leader>ti :call ToggleInteractiveShell()<cr>
+
+" Start interactive EasyAlign in visual mode (e.g. vipga)
+xmap ga <Plug>(EasyAlign)
+
+" Start interactive EasyAlign for a motion/text object (e.g. gaip)
+nmap ga <Plug>(EasyAlign)
 " inoremap <C-o> <esc>O}}}
 
 " Plugin Settings & Mappings{{{
@@ -176,7 +203,77 @@ let g:vimwiki_list = [{ 'path': '~/.wiki/', 'syntax':'markdown', 'ext': '.md' }]
 nnoremap <leader>gw :Gwrite<cr>
 nnoremap <leader>gr :Gread<cr>
 nnoremap <leader>gs :G<cr>
-nnoremap <leader>gd :Gdiffsplit!<cr>"}}}
+nnoremap <leader>gd :Gdiffsplit!<cr>
+
+" fzf{{{
+" autocmd! FileType fzf
+" autocmd  FileType fzf set noshowmode noruler nonu
+
+" if exists('$TMUX')
+  " let g:fzf_layout = { 'tmux': '-p90%,60%' }
+" else
+  " let g:fzf_layout = { 'window': { 'width': 0.9, 'height': 0.6 } }
+" endif
+
+" nnoremap <silent> <expr> <Leader><Leader> (expand('%') =~ 'NERD_tree' ? "\<c-w>\<c-w>" : '').":Files\<cr>"
+" nnoremap <silent> <Leader>C        :Colors<CR>
+" nnoremap <silent> <Leader><Enter>  :Buffers<CR>
+" nnoremap <silent> <Leader>L        :Lines<CR>
+" nnoremap <silent> <Leader>ag       :Ag <C-R><C-W><CR>
+" nnoremap <silent> <Leader>AG       :Ag <C-R><C-A><CR>
+" xnoremap <silent> <Leader>ag       y:Ag <C-R>"<CR>
+" nnoremap <silent> <Leader>`        :Marks<CR>
+" nnoremap <silent> q: :History:<CR>
+" nnoremap <silent> q/ :History/<CR>
+
+" inoremap <expr> <c-x><c-t> fzf#complete('tmuxwords.rb --all-but-current --scroll 500 --min 5')
+" imap <c-x><c-k> <plug>(fzf-complete-word)
+" imap <c-x><c-f> <plug>(fzf-complete-path)
+" inoremap <expr> <c-x><c-d> fzf#vim#complete#path('blsd')
+" imap <c-x><c-j> <plug>(fzf-complete-file-ag)
+" imap <c-x><c-l> <plug>(fzf-complete-line)
+
+" nmap <leader><tab> <plug>(fzf-maps-n)
+" xmap <leader><tab> <plug>(fzf-maps-x)
+" omap <leader><tab> <plug>(fzf-maps-o)
+
+" function! s:plug_help_sink(line)
+  " let dir = g:plugs[a:line].dir
+  " for pat in ['doc/*.txt', 'README.md']
+    " let match = get(split(globpath(dir, pat), "\n"), 0, '')
+    " if len(match)
+      " execute 'tabedit' match
+      " return
+    " endif
+  " endfor
+  " tabnew
+  " execute 'Explore' dir
+" endfunction
+
+" command! PlugHelp call fzf#run(fzf#wrap({
+  " \ 'source': sort(keys(g:plugs)),
+  " \ 'sink':   function('s:plug_help_sink')}))
+
+" from https://github.com/junegunn/fzf.vim
+function! RipgrepFzf(query, fullscreen)
+  let command_fmt = 'rg --column --line-number --no-heading --color=always --smart-case %s || true'
+  let initial_command = printf(command_fmt, shellescape(a:query))
+  let reload_command = printf(command_fmt, '{q}')
+  let options = {'options': ['--phony', '--query', a:query, '--bind', 'change:reload:'.reload_command]}
+  if a:fullscreen
+    let options = fzf#vim#with_preview(options)
+  endif
+  call fzf#vim#grep(initial_command, 1, options, a:fullscreen)
+endfunction
+
+command! -nargs=* -bang RG call RipgrepFzf(<q-args>, <bang>0)
+
+nnoremap <silent> <leader>B :Buffers<CR>
+nnoremap <silent> <leader>C :Commits<CR>
+nnoremap <silent> <leader>F :Files<CR>
+nnoremap <silent> <leader>G :Rg<CR>
+nnoremap <silent> <leader>L :Lines<CR>}}}
+"}}}
 
 " SQL Functions & Abbreviations{{{
 
@@ -553,6 +650,7 @@ endfunction"}}}
 if has("autocmd")
     filetype on
     autocmd BufReadPost fugitive://* set bufhidden=delete " clean fugitive Gedit buffers
+    " autocmd CmdwinEnter * map <buffer> <leader><space> <CR>q:
 
     " dbt{{{
     augroup filetype_dbt
@@ -565,9 +663,45 @@ if has("autocmd")
     " Go{{{
     augroup filetype_go
         autocmd!
+
         autocmd FileType go setlocal autowrite ts=8 sts=8 sw=8 noet
-        autocmd FileType go nmap <leader>b <Plug>(go-build)
+
+        let g:go_list_type = "quickfix"
+        " 10 seconds it the default, but it can be adjusted
+        " with g:go_test_timeout as necessary
+        let g:go_test_timeout = '10s'
+        let g:go_fmt_command = "goimports"
+        " this setting controls whether doc strings are selected
+        " with af motion
+        let g:go_textobj_include_function_doc = 1
+
+        " the default
+        " let g:go_metalinter_enabled = ['vet', 'golint', 'errcheck']
+        " let g:go_metalinter_autosave = 1
+        " let g:go_metalinter_autosave_enabled = ['vet', 'golint']
+        " let g:go_metalinter_deadline = \"5s\"
+
+        " run :GoBuild or :GoTestCompile based on the go file
+        function! s:build_go_files()
+          let l:file = expand('%')
+          if l:file =~# '^\f\+_test\.go$'
+            call go#test#Test(0, 1)
+          elseif l:file =~# '^\f\+\.go$'
+            call go#cmd#Build(0)
+          endif
+        endfunction
+
+        autocmd FileType go nmap <leader>b :<C-u>call <SID>build_go_files()<CR>
         autocmd FileType go nmap <leader>r <Plug>(go-run)
+        autocmd FileType go nmap <leader>t <Plug>(go-test)
+        autocmd FileType go nmap <leader>c <Plug>(go-coverage-toggle)
+        autocmd FileType go nmap <leader>i <Plug>(go-info)
+
+        autocmd Filetype go command! -bang A call go#alternate#Switch(<bang>0, 'edit')
+        autocmd Filetype go command! -bang AV call go#alternate#Switch(<bang>0, 'vsplit')
+        autocmd Filetype go command! -bang AS call go#alternate#Switch(<bang>0, 'split')
+        autocmd Filetype go command! -bang AT call go#alternate#Switch(<bang>0, 'tabe')
+
     augroup END"}}}
 
     " Haskell{{{
@@ -586,7 +720,8 @@ if has("autocmd")
     " Python{{{
     augroup filetype_python
         autocmd!
-        autocmd FileType python setlocal ts=4 sts=4 sw=4 et
+        autocmd FileType python setlocal ts=4 sts=4 sw=4 textwidth=79 et
+        autocmd FileType python set fileformat=unix
     augroup END"}}}
 
     " Shell{{{
