@@ -101,6 +101,25 @@ function! s:Preserve(func)
     call a:func()
     let @/=_s
     call cursor(l, c)
+endfunction
+
+" :Z command to switch to frecent directories
+function! s:z(a, l, p)
+    let list = systemlist('_z -l ' . a:a)
+    return map(list, {_, v -> substitute(v, '\S\+\s\+', '', '')})
+endfunction
+command! -nargs=1 -complete=customlist,<SID>z Z execute 'tcd ' . <SID>z(<q-args>, '', '')[0]
+
+function! ToggleInteractiveShell()
+    " toggle to make vim’s :! shell
+    " behave like interactive shell
+    let l:flag = &shellcmdflag
+    if l:flag ==# '-c'
+        set shellcmdflag=-ic
+    elseif l:flag ==# '-ic'
+        set shellcmdflag=-c
+    endif
+    echom 'shellcmdflag=' . &shellcmdflag
 endfunction"}}}
 
 " Mappings{{{
