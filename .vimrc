@@ -167,6 +167,9 @@ nnoremap <silent> <leader>tl :tablast<cr>
 nnoremap <leader>" viw<esc>a"<esc>bi"<esc>lel
 nnoremap <leader>' viw<esc>a'<esc>bi'<esc>lel
 
+" add escape without entering insert mode
+nnoremap <leader>\ i\\<esc>
+
 " insert lines from normal mode
 nnoremap <silent> <leader>o :<C-u>call append(line("."),   repeat([""], v:count1))<cr>
 nnoremap <silent> <leader>O :<C-u>call append(line(".")-1, repeat([""], v:count1))<cr>
@@ -313,12 +316,12 @@ if has("autocmd")
 
         " run :GoBuild or :GoTestCompile based on the go file
         function! s:build_go_files()
-          let l:file = expand('%')
-          if l:file =~# '^\f\+_test\.go$'
-            call go#test#Test(0, 1)
-          elseif l:file =~# '^\f\+\.go$'
-            call go#cmd#Build(0)
-          endif
+            let l:file = expand('%')
+            if l:file =~# '^\f\+_test\.go$'
+                call go#test#Test(0, 1)
+            elseif l:file =~# '^\f\+\.go$'
+                call go#cmd#Build(0)
+            endif
         endfunction
 
         autocmd FileType go nmap <leader>b :<C-u>call <SID>build_go_files()<CR>
