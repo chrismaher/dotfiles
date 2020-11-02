@@ -3,7 +3,7 @@
 	au = add -u
 	br = branch
 	cb = checkout -b
-	ci = commit -v
+	ci = commit
 	co = checkout
 	cp = cherry-pick
 	dc = diff --cached
@@ -20,6 +20,7 @@
 	st = status
 	sh = show --name-status --pretty=short --abbrev-commit
 	um = "!git ls-files -u | cut -f 2 | sort -u" # git diff --name-only --diff-filter=U
+	mt = mergetool
 [core]
 	editor = vim
 	excludesFile = ~/.gitignore
@@ -38,3 +39,9 @@
 	ff = only
 [pretty]
 	logfmt = %Cred%h%Creset%C(yellow)%d%Creset %s %Cblue(%an)%Creset %Cgreen(%cr)%Creset
+[merge]
+	tool = vimdiff
+[mergetool]
+	prompt = false
+[commit]
+	verbose = true
