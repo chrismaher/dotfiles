@@ -3,9 +3,6 @@ syntax on
 set number
 set autoindent
 
-" centralize swap files
-set directory^=$HOME/.vim/tmp//
-
 set smarttab
 set expandtab
 set tabstop=4
@@ -19,7 +16,8 @@ set backspace=indent,eol,start
 " disable error bells
 set noerrorbells
 
-set pastetoggle=<leader>pt"}}}
+set splitright
+"}}}
 
 " Plugins{{{
 call plug#begin('~/.vim/plugged')
@@ -28,6 +26,7 @@ Plug 'preservim/nerdtree'
 Plug 'preservim/nerdcommenter'
 
 Plug 'tpope/vim-fugitive'
+Plug 'tpope/vim-rhubarb'
 Plug 'tpope/vim-unimpaired'
 
 Plug 'vim-airline/vim-airline'
@@ -39,7 +38,7 @@ Plug 'christoomey/vim-tmux-navigator'
 
 Plug 'junegunn/vim-easy-align'
 Plug 'junegunn/vader.vim'
-Plug 'junegunn/gv.vim'
+" Plug 'junegunn/gv.vim'
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
 
@@ -121,6 +120,16 @@ function! s:z(a, l, p)
 endfunction
 command! -nargs=1 -complete=customlist,<SID>z Z execute 'tcd ' . <SID>z(<q-args>, '', '')[0]
 
+
+function! ToggleDiff()
+    if &diff == 1
+        :diffoff
+    else
+        NERDTreeClose
+        windo diffthis
+    endif
+endfunction
+
 function! ToggleInteractiveShell()
     " toggle to make vim’s :! shell
     " behave like interactive shell
@@ -149,7 +158,7 @@ inoremap <esc> <nop>
 " yank to system clipboard
 noremap <leader>y "*y
 
-" map vim exits
+" vim exits
 noremap <leader>w :w<cr>
 noremap <leader>q :q<cr>
 noremap <leader>qq :q!<cr>
@@ -157,40 +166,46 @@ noremap <leader>qa :qa<cr>
 noremap <leader>qqa :qa!<cr>
 " noremap <leader>z :wa <bar> :qa<cr>
 
-" map tab operations
-nnoremap <silent> <leader>tn :tabnew<cr>
+" tab operations
+nnoremap <silent> <leader>te :tabedit<cr>
+nnoremap <silent> <leader>tn :tabnext<cr>
+nnoremap <silent> <leader>tp :tabprevious<cr>
 nnoremap <silent> <leader>tc :tabclose<cr>
+nnoremap <silent> <leader>tm :tabmove +1<cr>
+nnoremap <silent> <leader>tM :tabmove -1<cr>
 nnoremap <silent> <leader>tf :tabfirst<cr>
 nnoremap <silent> <leader>tl :tablast<cr>
-" nnoremap <leader>tm :tabmove<space>
 
 nnoremap <leader>" viw<esc>a"<esc>bi"<esc>lel
 nnoremap <leader>' viw<esc>a'<esc>bi'<esc>lel
 
-" add escape without entering insert mode
-nnoremap <leader>\ i\\<esc>
-
-" insert lines from normal mode
-nnoremap <silent> <leader>o :<C-u>call append(line("."),   repeat([""], v:count1))<cr>
-nnoremap <silent> <leader>O :<C-u>call append(line(".")-1, repeat([""], v:count1))<cr>
-
-" buffer mappings
-noremap <leader>bn :bn<cr>
+nnoremap <leader>sb :vert sb #<cr>
 
 " visually select pasted text
 nnoremap gp `[v`]
+nnoremap <leader>< V`]<
+nnoremap <leader>> V`]>
 
-nnoremap <leader>rt :%retab<cr>
+noremap <leader>rt :%retab<cr>
 
 noremap <leader>tw :call TrimWhitespace()<cr>
 noremap <silent> <leader>ti :call ToggleInteractiveShell()<cr>
+noremap <silent> <leader>dt :call ToggleDiff()<cr>
 
-" Start interactive EasyAlign in visual mode (e.g. vipga)
-xmap ga <Plug>(EasyAlign)
+nnoremap <leader>sq :set ft=sql<cr>
 
-" Start interactive EasyAlign for a motion/text object (e.g. gaip)
-nmap ga <Plug>(EasyAlign)
-" inoremap <C-o> <esc>O}}}
+nnoremap <silent> <leader>cw :let @/=expand('<cword>')<cr>cgn
+
+" open & close terminal buffer
+nnoremap <silent> <leader>vt :vertical terminal<cr>
+tnoremap <Esc> <C-\><C-n>:bd!<cr>
+
+nnoremap Q @q
+
+" noremap cp yap<S-}>p
+
+inoremap <C-b> <C-o>b
+"}}}
 
 " Plugin Settings & Mappings{{{
 
@@ -204,10 +219,17 @@ noremap <leader>nt :NERDTreeToggle<cr>
 let g:vimwiki_list = [{ 'path': '~/.wiki/', 'syntax':'markdown', 'ext': '.md' }]
 
 " Fugitive
+nnoremap <leader>gb :Gblame<cr>
 nnoremap <leader>gw :Gwrite<cr>
 nnoremap <leader>gr :Gread<cr>
 nnoremap <leader>gs :G<cr>
 nnoremap <leader>gd :Gdiffsplit!<cr>
+
+" Start interactive EasyAlign in visual mode (e.g. vipga)
+xmap ga <Plug>(EasyAlign)
+
+" Start interactive EasyAlign for a motion/text object (e.g. gaip)
+nmap ga <Plug>(EasyAlign)
 
 " fzf{{{
 " autocmd! FileType fzf
@@ -282,6 +304,10 @@ nnoremap <silent> <leader>L :Lines<CR>}}}
 " Filetype Settings{{{
 if has("autocmd")
     filetype on
+
+    " open vim help in a vertical split
+    autocmd FileType help wincmd L
+
     autocmd BufReadPost fugitive://* set bufhidden=delete " clean fugitive Gedit buffers
     " autocmd CmdwinEnter * map <buffer> <leader><space> <CR>q:
 
