@@ -17,14 +17,18 @@ set backspace=indent,eol,start
 set noerrorbells
 
 set splitright
+
+set undodir=~/.vim/undodir
+set undofile
 "}}}
 
 " Plugins{{{
 call plug#begin('~/.vim/plugged')
 
 Plug 'preservim/nerdtree'
-Plug 'preservim/nerdcommenter'
 
+Plug 'tpope/vim-commentary'
+Plug 'tpope/vim-eunuch'
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-rhubarb'
 Plug 'tpope/vim-unimpaired'
@@ -147,6 +151,14 @@ endfunction"}}}
 let mapleader = ","
 let maplocalleader = "\\"
 
+" open leader mappings
+" nnoremap <leader>.
+" nnoremap <leader>;
+" nnoremap <leader><bar>
+" nnoremap <leader>m
+" nnoremap <leader>k
+" nnoremap <leader>j
+
 " .vimrc editing
 nnoremap <leader>ev :vsplit $MYVIMRC<cr>
 nnoremap <leader>sv :source $MYVIMRC<cr>
@@ -179,13 +191,16 @@ nnoremap <silent> <leader>tl :tablast<cr>
 nnoremap <leader>" viw<esc>a"<esc>bi"<esc>lel
 nnoremap <leader>' viw<esc>a'<esc>bi'<esc>lel
 
-nnoremap <leader>sb :vert sb #<cr>
+nnoremap <leader>sb :vertical sbuffer #<cr>
+
+nnoremap <leader>up :tcd ..<cr>
 
 " visually select pasted text
 nnoremap gp `[v`]
 nnoremap <leader>< V`]<
 nnoremap <leader>> V`]>
 
+nnoremap <leader>, :ls<cr>
 noremap <leader>rt :%retab<cr>
 
 noremap <leader>tw :call TrimWhitespace()<cr>
@@ -197,8 +212,11 @@ nnoremap <leader>sq :set ft=sql<cr>
 nnoremap <silent> <leader>cw :let @/=expand('<cword>')<cr>cgn
 
 " open & close terminal buffer
+nnoremap <silent> <leader>ht :terminal<cr>
 nnoremap <silent> <leader>vt :vertical terminal<cr>
-tnoremap <Esc> <C-\><C-n>:bd!<cr>
+tnoremap <esc> <C-\><C-n>:bd!<cr>
+
+" nnoremap <silent> <leader>, :ls<cr>
 
 nnoremap Q @q
 
@@ -225,11 +243,17 @@ nnoremap <leader>gr :Gread<cr>
 nnoremap <leader>gs :G<cr>
 nnoremap <leader>gd :Gdiffsplit!<cr>
 
+" EasyAlign
 " Start interactive EasyAlign in visual mode (e.g. vipga)
 xmap ga <Plug>(EasyAlign)
-
 " Start interactive EasyAlign for a motion/text object (e.g. gaip)
 nmap ga <Plug>(EasyAlign)
+
+" Ack
+if executable('rg')
+    let g:ackprg = 'rg --vimgrep'
+endif
+nnoremap <leader>ac :Ack <cword><cr>
 
 " fzf{{{
 " autocmd! FileType fzf
@@ -294,19 +318,25 @@ endfunction
 
 command! -nargs=* -bang RG call RipgrepFzf(<q-args>, <bang>0)
 
-nnoremap <silent> <leader>B :Buffers<CR>
-nnoremap <silent> <leader>C :Commits<CR>
-nnoremap <silent> <leader>F :Files<CR>
-nnoremap <silent> <leader>G :Rg<CR>
-nnoremap <silent> <leader>L :Lines<CR>}}}
+nnoremap <silent> <leader>f :Files<CR>
+nnoremap <silent> <leader>F :GFiles<CR>
+nnoremap <silent> <leader>b :Buffers<CR>
+nnoremap <silent> <leader>h :History<CR>
+nnoremap <silent> <leader>l :BLines<CR>
+nnoremap <silent> <leader>L :Lines<CR>
+nnoremap <silent> <leader>' :Marks<CR>
+nnoremap <silent> <leader>/ :Rg<CR>
+" nnoremap <silent> <leader>C :Commits<CR>
+nnoremap <silent> <leader>C :Commands<CR>
+nnoremap <silent> <leader>H :Helptags<CR>
+"}}}
 "}}}
 
 " Filetype Settings{{{
 if has("autocmd")
     filetype on
 
-    " open vim help in a vertical split
-    autocmd FileType help wincmd L
+    " autocmd BufWritePost .vimrc source $MYVIMRC
 
     autocmd BufReadPost fugitive://* set bufhidden=delete " clean fugitive Gedit buffers
     " autocmd CmdwinEnter * map <buffer> <leader><space> <CR>q:
@@ -369,11 +399,18 @@ if has("autocmd")
         autocmd FileType haskell setlocal ts=4 sts=4 sw=4 et
     augroup END"}}}
 
+    " Help{{{
+    augroup filetype_help
+        autocmd!
+        " open vim help in a vertical split
+        autocmd FileType help wincmd L
+        autocmd FileType help nnoremap <buffer>q :q<CR>
+    augroup END"}}}
+
     " LookML{{{
     augroup filetype_lookml
         autocmd!
         autocmd FileType lookml setlocal ts=2 sts=2 sw=2 et
-        let @d=':s/\s*\(.*\)/\tdimension: \1 {\r\t\ttype: string\r\t\tdescription: ""\r\t}/\<CR>'
     augroup END"}}}
 
     " Python{{{
