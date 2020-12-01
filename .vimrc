@@ -4,9 +4,16 @@ set number
 set autoindent
 
 set smarttab
+" use spaces when pressing tab in insert
 set expandtab
+" a tab character has length 4
 set tabstop=4
+" used for indent features ('<<' and the like)
 set shiftwidth=4
+" round < and the like to nearest shiftwidth
+set shiftround
+" backspace over 4 spaces if possible
+set softtabstop=4
 
 set clipboard=unnamed
 
@@ -18,8 +25,14 @@ set noerrorbells
 
 set splitright
 
-set undodir=~/.vim/undodir
-set undofile
+if has("persistent_undo")
+    set undodir=~/.vim/undodir
+    set undofile
+endif
+
+" Keep 200 lines of command history
+set history=200
+
 "}}}
 
 " Plugins{{{
@@ -126,6 +139,30 @@ function! ToggleDiff()
         NERDTreeClose
         windo diffthis
     endif
+endfunction
+
+" let g:quickfix_is_open = 0
+" function! QuickfixToggle()
+    " if g:quickfix_is_open
+        " cclose
+        " let g:quickfix_is_open = 0
+    " else
+        " copen
+        " let g:quickfix_is_open = 1
+    " endif
+" endfunction
+
+function! ListLeaders()
+    silent! redir @a
+    silent! nmap <leader>
+    silent! redir END
+    silent! new
+    silent! put! a
+    silent! g/^s*$/d
+    silent! %s/^.*,//
+    silent! normal ggVg
+    silent! sort
+    silent! let lines = getline(1,"$")
 endfunction
 
 function! ToggleInteractiveShell()
