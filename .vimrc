@@ -25,6 +25,28 @@ set undofile
 " Plugins{{{
 call plug#begin('~/.vim/plugged')
 
+Plug 'christoomey/vim-tmux-navigator'
+
+" Plug 'dense-analysis/ale', { 'for': 'haskell' }
+
+Plug 'fatih/vim-go', { 'for': 'go' }
+
+Plug 'git@github-personal:chrismaher/vim-dbt'
+Plug 'git@github-personal:chrismaher/vim-lookml.git'
+Plug 'git@github-personal:chrismaher/vim-sql-case.git', { 'for': 'sql' }
+
+Plug 'junegunn/vim-easy-align'
+Plug 'junegunn/vader.vim'
+Plug 'junegunn/gv.vim'
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+Plug 'junegunn/fzf.vim'
+
+Plug 'mbbill/undotree'
+
+Plug 'mileszs/ack.vim'
+
+Plug 'nvie/vim-flake8', { 'for': 'python' }
+
 Plug 'preservim/nerdtree'
 
 Plug 'tpope/vim-commentary'
@@ -35,34 +57,7 @@ Plug 'tpope/vim-unimpaired'
 
 Plug 'vim-airline/vim-airline'
 
-Plug 'nvie/vim-flake8', { 'for': 'python' }
-Plug 'fatih/vim-go', { 'for': 'go' }
-
-Plug 'christoomey/vim-tmux-navigator'
-
-Plug 'junegunn/vim-easy-align'
-Plug 'junegunn/vader.vim'
-" Plug 'junegunn/gv.vim'
-Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
-Plug 'junegunn/fzf.vim'
-
-" Plug 'ctrlpvim/ctrlp.vim'
-" Plug 'dense-analysis/ale', { 'for': 'haskell' }
-
-" Plug 'godlygeek/tabular'
-" Plug 'plasticboy/vim-markdown'
-
 Plug 'vimwiki/vimwiki', { 'branch': 'dev' }
-
-" Plug 'SirVer/ultisnips'
-
-" Plug 'mbbill/undotree'
-
-Plug 'mileszs/ack.vim'
-
-Plug 'git@github-personal:chrismaher/vim-dbt'
-Plug 'git@github-personal:chrismaher/vim-lookml.git'
-Plug 'git@github-personal:chrismaher/vim-sql-case.git', { 'for': 'sql' }
 
 call plug#end()"}}}
 
@@ -123,7 +118,6 @@ function! s:z(a, l, p)
     return map(list, {_, v -> substitute(v, '\S\+\s\+', '', '')})
 endfunction
 command! -nargs=1 -complete=customlist,<SID>z Z execute 'tcd ' . <SID>z(<q-args>, '', '')[0]
-
 
 function! ToggleDiff()
     if &diff == 1
@@ -227,14 +221,17 @@ inoremap <C-b> <C-o>b
 
 " Plugin Settings & Mappings{{{
 
-" NERDCommenter
-let g:NERDSpaceDelims = 1
+" Ack
+if executable('rg')
+    let g:ackprg = 'rg --vimgrep'
+endif
+nnoremap <leader>ac :Ack <cword><cr>
 
-" NERDTree
-noremap <leader>nt :NERDTreeToggle<cr>
-
-" VimWiki
-let g:vimwiki_list = [{ 'path': '~/.wiki/', 'syntax':'markdown', 'ext': '.md' }]
+" EasyAlign
+" Start interactive EasyAlign in visual mode (e.g. vipga)
+xmap ga <Plug>(EasyAlign)
+" Start interactive EasyAlign for a motion/text object (e.g. gaip)
+nmap ga <Plug>(EasyAlign)
 
 " Fugitive
 nnoremap <leader>gb :Gblame<cr>
@@ -243,17 +240,17 @@ nnoremap <leader>gr :Gread<cr>
 nnoremap <leader>gs :G<cr>
 nnoremap <leader>gd :Gdiffsplit!<cr>
 
-" EasyAlign
-" Start interactive EasyAlign in visual mode (e.g. vipga)
-xmap ga <Plug>(EasyAlign)
-" Start interactive EasyAlign for a motion/text object (e.g. gaip)
-nmap ga <Plug>(EasyAlign)
+" GV
+noremap <leader>gv :GV<cr>
 
-" Ack
-if executable('rg')
-    let g:ackprg = 'rg --vimgrep'
-endif
-nnoremap <leader>ac :Ack <cword><cr>
+" NERDTree
+noremap <leader>nt :NERDTreeToggle<cr>
+
+" Undotree
+noremap <leader>ut :UndotreeToggle<cr>
+
+" VimWiki
+let g:vimwiki_list = [{ 'path': '~/.wiki/', 'syntax':'markdown', 'ext': '.md' }]
 
 " fzf{{{
 " autocmd! FileType fzf
