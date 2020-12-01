@@ -10,10 +10,10 @@ set expandtab
 set tabstop=4
 " used for indent features ('<<' and the like)
 set shiftwidth=4
-" round < and the like to nearest shiftwidth
-set shiftround
 " backspace over 4 spaces if possible
 set softtabstop=4
+" round < and the like to nearest shiftwidth
+set shiftround
 
 set clipboard=unnamed
 
@@ -409,19 +409,11 @@ if has("autocmd")
     autocmd BufReadPost fugitive://* set bufhidden=delete " clean fugitive Gedit buffers
     " autocmd CmdwinEnter * map <buffer> <leader><space> <CR>q:
 
-    " dbt{{{
-    augroup filetype_dbt
-        autocmd!
-        autocmd FileType dbt setlocal ts=4 sts=4 sw=4 et
-        autocmd FileType dbt nmap <leader>u :call <SID>Preserve(function('<SID>UppercaseSQL'))<CR>
-        autocmd FileType dbt call <SID>SQLAbbrevs()
-    augroup END"}}}
-
     " Go{{{
     augroup filetype_go
         autocmd!
 
-        autocmd FileType go setlocal autowrite ts=8 sts=8 sw=8 noet
+        autocmd FileType go setlocal autowrite tabstop=8 softtabstop=8 shiftwidth=8 noexpandtab
 
         let g:go_list_type = "quickfix"
         " 10 seconds it the default, but it can be adjusted
@@ -461,12 +453,6 @@ if has("autocmd")
 
     augroup END"}}}
 
-    " Haskell{{{
-    augroup filetype_haskell
-        autocmd!
-        autocmd FileType haskell setlocal ts=4 sts=4 sw=4 et
-    augroup END"}}}
-
     " Help{{{
     augroup filetype_help
         autocmd!
@@ -478,35 +464,32 @@ if has("autocmd")
     " LookML{{{
     augroup filetype_lookml
         autocmd!
-        autocmd FileType lookml setlocal ts=2 sts=2 sw=2 et
+        autocmd FileType lookml setlocal tabstop=2 softtabstop=2 shiftwidth=2
     augroup END"}}}
 
     " Python{{{
     augroup filetype_python
         autocmd!
-        autocmd FileType python setlocal ts=4 sts=4 sw=4 textwidth=79 et
+        autocmd FileType python setlocal textwidth=79
         autocmd FileType python set fileformat=unix
     augroup END"}}}
 
     " Shell{{{
     augroup filtetype_sh
         autocmd!
-        autocmd FileType sh setlocal foldmethod=marker ts=4 sts=4 sw=4 et
+        autocmd FileType sh setlocal foldmethod=marker
     augroup End"}}}
 
     " SQL{{{
     augroup filetype_sql
         autocmd!
-        autocmd FileType sql setlocal ts=4 sts=4 sw=4 et
-        " autocmd FileType sql nmap <silent> <leader>u :call <SID>Preserve(function('<SID>UppercaseSQL'))<CR>
-        " autocmd FileType sql call <SID>SQLAbbrevs()
         autocmd FileType sql nmap <leader>sc <Plug>(sql-case)
     augroup END"}}}
 
     " Vimscript{{{
     augroup filtetype_vim
         autocmd!
-        autocmd FileType vim setlocal foldmethod=marker ts=4 sts=4 sw=4 et
+        autocmd FileType vim setlocal foldmethod=marker
     augroup End"}}}
 
     " VimWiki{{{
@@ -518,6 +501,6 @@ if has("autocmd")
     " YAML{{{
     augroup filetype_yaml
         autocmd!
-        autocmd FileType yaml setlocal ts=2 sts=2 sw=2 et
+        autocmd FileType yaml setlocal tabstop=2 sts=2 shiftwidth=2
     augroup End"}}}
 endif"}}}
