@@ -145,17 +145,22 @@ endfunction"}}}
 let mapleader = ","
 let maplocalleader = "\\"
 
-" open leader mappings
+" open leader single-key mappings
 " nnoremap <leader>.
-" nnoremap <leader>;
 " nnoremap <leader><bar>
+" nnoremap <leader>[
+" nnoremap <leader>]
+" nnoremap <leader>-
+" nnoremap <leader>=
+
+" open leader mappings
 " nnoremap <leader>m
 " nnoremap <leader>k
 " nnoremap <leader>j
 
 " .vimrc editing
-nnoremap <leader>ev :vsplit $MYVIMRC<cr>
-nnoremap <leader>sv :source $MYVIMRC<cr>
+nnoremap <silent> <leader>ev :vsplit $MYVIMRC<cr>
+nnoremap <silent> <leader>sv :source $MYVIMRC<cr>
 
 " remap insert-mode escape
 inoremap jk <esc>
@@ -164,13 +169,28 @@ inoremap <esc> <nop>
 " yank to system clipboard
 noremap <leader>y "*y
 
+" list buffers
+nnoremap <leader>, :buffers<cr>
+
+" list registers
+nnoremap <leader>; :registers<cr>
+
 " vim exits
 noremap <leader>w :w<cr>
 noremap <leader>q :q<cr>
-noremap <leader>qq :q!<cr>
+noremap <leader>Q :q!<cr>
 noremap <leader>qa :qa<cr>
-noremap <leader>qqa :qa!<cr>
+noremap <leader>Qa :qa!<cr>
 " noremap <leader>z :wa <bar> :qa<cr>
+
+" open alternate buffer in a vertical split
+nnoremap <leader>sb :vertical sbuffer #<cr>
+
+" window operations
+nnoremap <silent> <leader>vn :vnew<cr>
+nnoremap <silent> <leader>wr <c-w>R
+nnoremap <silent> <leader>wt <c-w>T
+nnoremap <silent> <leader>wo <c-w>o
 
 " tab operations
 nnoremap <silent> <leader>te :tabedit<cr>
@@ -182,41 +202,55 @@ nnoremap <silent> <leader>tM :tabmove -1<cr>
 nnoremap <silent> <leader>tf :tabfirst<cr>
 nnoremap <silent> <leader>tl :tablast<cr>
 
-nnoremap <leader>" viw<esc>a"<esc>bi"<esc>lel
-nnoremap <leader>' viw<esc>a'<esc>bi'<esc>lel
-
-nnoremap <leader>sb :vertical sbuffer #<cr>
-
-nnoremap <leader>up :tcd ..<cr>
-
 " visually select pasted text
-nnoremap gp `[v`]
+nnoremap <leader>vp `[v`]
+nnoremap <leader>v= `[v`]=
 nnoremap <leader>< V`]<
 nnoremap <leader>> V`]>
 
-nnoremap <leader>, :ls<cr>
-noremap <leader>rt :%retab<cr>
+" change matches with cgn, starting with the word under the cursor
+nnoremap <silent> <leader>cw :let @/=expand('<cword>')<cr>cgn
+
+" wrap words in single or double quotes
+nnoremap <leader>" viw<esc>a"<esc>bi"<esc>lel
+nnoremap <leader>' viw<esc>a'<esc>bi'<esc>lel
+
+" change directory
+nnoremap <leader>up :tcd ..<cr>
+nnoremap <silent> <leader>cd :tcd %:p:h<cr>
+
+" change filetype
+nnoremap <leader>sq :set filetype=sql<cr>
+
+" noremap <leader>rt :%retab<cr>
 
 noremap <leader>tw :call TrimWhitespace()<cr>
+
 noremap <silent> <leader>ti :call ToggleInteractiveShell()<cr>
 noremap <silent> <leader>dt :call ToggleDiff()<cr>
-
-nnoremap <leader>sq :set ft=sql<cr>
-
-nnoremap <silent> <leader>cw :let @/=expand('<cword>')<cr>cgn
+nnoremap <silent> <leader>qt :call QuickfixToggle()
 
 " open & close terminal buffer
 nnoremap <silent> <leader>ht :terminal<cr>
 nnoremap <silent> <leader>vt :vertical terminal<cr>
 tnoremap <esc> <C-\><C-n>:bd!<cr>
 
-" nnoremap <silent> <leader>, :ls<cr>
-
+" run 'throwaway' macros in the q register with Q
 nnoremap Q @q
 
+" clone paragragh
 " noremap cp yap<S-}>p
 
-inoremap <C-b> <C-o>b
+" insert-mode mappings
+inoremap <M-b> <C-O>b
+inoremap <M-B> <C-O>B
+inoremap <M-o> <C-O>O
+inoremap <M-I> <C-O>^
+inoremap <M-A> <C-O>$
+inoremap <C-J> <Down>
+inoremap <C-K> <Up>
+" inoremap <C-b> <C-o>b
+" inoremap <M-o>      <C-O>o
 "}}}
 
 " Plugin Settings & Mappings{{{
