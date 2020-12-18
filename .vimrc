@@ -22,7 +22,9 @@ set backspace=indent,eol,start
 
 " disable error bells
 set noerrorbells
+set vb t_vb=
 
+" open new vertical splits on the right
 set splitright
 
 if has("persistent_undo")
@@ -182,22 +184,38 @@ endfunction"}}}
 let mapleader = ","
 let maplocalleader = "\\"
 
+" open single-key/prefix mappings
+" nnoremap <space>
+" nnoremap <tab>
+
 " open leader single-key mappings
-" nnoremap <leader>.
+" nnoremap <leader><space>
+" nnoremap <leader><tab>
 " nnoremap <leader><bar>
-" nnoremap <leader>[
-" nnoremap <leader>]
-" nnoremap <leader>-
 " nnoremap <leader>=
 
 " open leader mappings
-" nnoremap <leader>m
+" nnoremap <tab>
 " nnoremap <leader>k
+" nnoremap <leader>i
 " nnoremap <leader>j
+" nnoremap <leader>m
+" nnoremap <leader>o
+" nnoremap <leader>p
+" nnoremap <leader>z
+
+" list arguments
+nnoremap <silent> <leader>. :args<cr>
+
+" list buffers
+nnoremap <silent> <leader>, :buffers<cr>
+
+" list registers
+nnoremap <silent> <leader>; :registers<cr>
 
 " .vimrc editing
 nnoremap <silent> <leader>ev :vsplit $MYVIMRC<cr>
-nnoremap <silent> <leader>sv :source $MYVIMRC<cr>
+nnoremap <leader>sv :source $MYVIMRC<cr>
 
 " remap insert-mode escape
 inoremap jk <esc>
@@ -206,40 +224,67 @@ inoremap <esc> <nop>
 " yank to system clipboard
 noremap <leader>y "*y
 
-" list buffers
-nnoremap <leader>, :buffers<cr>
+" yank buffer to system clipboard... shouldn't move cursor!
+noremap <leader>Y ggVG"*y``
 
-" list registers
-nnoremap <leader>; :registers<cr>
+" paste last yank
+nnoremap <leader>py "0p
+
+" add to the argument list
+nnoremap <leader>aa :argadd<cr>
+
+" delete the previous argument
+nnoremap <leader>ad :argdelete #<cr>
+
+" reset buffer
+nnoremap <silent> <leader>- :edit!<cr>
 
 " vim exits
 noremap <leader>w :w<cr>
+noremap <leader>W :wa<cr>
 noremap <leader>q :q<cr>
-noremap <leader>Q :q!<cr>
-noremap <leader>qa :qa<cr>
-noremap <leader>Qa :qa!<cr>
-" noremap <leader>z :wa <bar> :qa<cr>
+noremap <leader>Q :qa<cr>
+noremap <leader>x :q!<cr>
+noremap <leader>X :qa!<cr>
 
-" open alternate buffer in a vertical split
+" argument mappings
+nnoremap <leader>af :first<cr>
+
+" new buffer
+nnoremap <silent> <leader>ee :enew<cr>
+
+" alternate buffer mappings
 nnoremap <leader>sb :vertical sbuffer #<cr>
+nnoremap <leader>bd :bd #<cr>
+nnoremap <silent> <leader>bc :bp\|bd #<cr>
 
 " window operations
 nnoremap <silent> <leader>vn :vnew<cr>
 nnoremap <silent> <leader>wr <c-w>R
 nnoremap <silent> <leader>wt <c-w>T
 nnoremap <silent> <leader>wo <c-w>o
+nnoremap <silent> <leader>o :only<cr>
 
 " tab operations
-nnoremap <silent> <leader>te :tabedit<cr>
-nnoremap <silent> <leader>tn :tabnext<cr>
-nnoremap <silent> <leader>tp :tabprevious<cr>
-nnoremap <silent> <leader>tc :tabclose<cr>
-nnoremap <silent> <leader>tm :tabmove +1<cr>
-nnoremap <silent> <leader>tM :tabmove -1<cr>
+nnoremap <silent> <leader>tt :tabedit<cr>
+nnoremap <silent> <leader>tq :tabclose<cr>
+nnoremap <silent> ]t :tabnext<cr>
+nnoremap <silent> [t :tabprevious<cr>
+nnoremap <silent> <leader>] :tabmove +1<cr>
+nnoremap <silent> <leader>[ :tabmove -1<cr>
 nnoremap <silent> <leader>tf :tabfirst<cr>
 nnoremap <silent> <leader>tl :tablast<cr>
+nnoremap <silent> <leader>1 1gt
+nnoremap <silent> <leader>2 2gt
+nnoremap <silent> <leader>3 3gt
+nnoremap <silent> <leader>4 4gt
+nnoremap <silent> <leader>5 5gt
+nnoremap <silent> <leader>6 6gt
+nnoremap <silent> <leader>7 7gt
+nnoremap <silent> <leader>8 8gt
+nnoremap <silent> <leader>9 9gt
 
-" visually select pasted text
+" operations on pasted text
 nnoremap <leader>vp `[v`]
 nnoremap <leader>v= `[v`]=
 nnoremap <leader>< V`]<
@@ -247,6 +292,8 @@ nnoremap <leader>> V`]>
 
 " change matches with cgn, starting with the word under the cursor
 nnoremap <silent> <leader>cw :let @/=expand('<cword>')<cr>cgn
+" nnoremap <Leader>x *``cgn
+" nnoremap <Leader>X #``cgN
 
 " wrap words in single or double quotes
 nnoremap <leader>" viw<esc>a"<esc>bi"<esc>lel
@@ -254,7 +301,7 @@ nnoremap <leader>' viw<esc>a'<esc>bi'<esc>lel
 
 " change directory
 nnoremap <leader>up :tcd ..<cr>
-nnoremap <silent> <leader>cd :tcd %:p:h<cr>
+nnoremap <leader>cd :tcd %:p:h<cr>
 
 " change filetype
 nnoremap <leader>sq :set filetype=sql<cr>
@@ -274,6 +321,9 @@ tnoremap <esc> <C-\><C-n>:bd!<cr>
 
 " run 'throwaway' macros in the q register with Q
 nnoremap Q @q
+
+" repeat the @q macro to the end of the buffer
+nnoremap <silent> <C-@> :.,$normal @q<cr>
 
 " clone paragragh
 " noremap cp yap<S-}>p
@@ -306,16 +356,24 @@ nmap ga <Plug>(EasyAlign)
 
 " Fugitive
 nnoremap <leader>gb :Gblame<cr>
-nnoremap <leader>gw :Gwrite<cr>
+nnoremap <leader>gd :Gdiffsplit!<cr>
+nnoremap <leader>gh :Gbrowse<cr>
+nnoremap <leader>gp :G pull<cr>
 nnoremap <leader>gr :Gread<cr>
 nnoremap <leader>gs :G<cr>
-nnoremap <leader>gd :Gdiffsplit!<cr>
+nnoremap <leader>gw :Gwrite<cr>
+
+xnoremap <leader>gh :Gbrowse<cr>
+xnoremap <leader>gb :Gblame<cr>
 
 " GV
 noremap <leader>gv :GV<cr>
 
 " NERDTree
 noremap <leader>nt :NERDTreeToggle<cr>
+
+" Unimpaired
+let g:nremap = {"[t": "", "]t": ""}
 
 " Undotree
 noremap <leader>ut :UndotreeToggle<cr>
