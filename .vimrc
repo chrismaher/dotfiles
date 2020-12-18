@@ -127,12 +127,24 @@ function! s:Preserve(func)
     call cursor(l, c)
 endfunction
 
-" :Z command to switch to frecent directories
-function! s:z(a, l, p)
+" autocomplete-ready function to list Z results
+function! s:z(a, l, p) abort
     let list = systemlist('_z -l ' . a:a)
     return map(list, {_, v -> substitute(v, '\S\+\s\+', '', '')})
 endfunction
-command! -nargs=1 -complete=customlist,<SID>z Z execute 'tcd ' . <SID>z(<q-args>, '', '')[0]
+
+" tcd to the most frecent Z result
+function! s:zcd(pattern) abort
+    try
+        let l:dir = s:z(a:pattern, '', '')[-1]
+        execute 'tcd ' . l:dir
+    catch
+        echohl WarningMsg | echo "No Z entry for '" . a:pattern . "' found" | echohl None
+    endtry
+endfunction
+
+" :Z command to switch to frecent directories
+command! -nargs=1 -complete=customlist,<sid>z Z call <sid>zcd(<q-args>)
 
 function! ToggleDiff()
     if &diff == 1
