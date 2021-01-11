@@ -155,16 +155,16 @@ function! ToggleDiff()
     endif
 endfunction
 
-" let g:quickfix_is_open = 0
-" function! QuickfixToggle()
-    " if g:quickfix_is_open
-        " cclose
-        " let g:quickfix_is_open = 0
-    " else
-        " copen
-        " let g:quickfix_is_open = 1
-    " endif
-" endfunction
+let g:quickfix_is_open = 0
+function! ToggleQuickfix()
+    if g:quickfix_is_open
+        cclose
+        let g:quickfix_is_open = 0
+    else
+        copen
+        let g:quickfix_is_open = 1
+    endif
+endfunction
 
 function! ListLeaders()
     silent! redir @a
@@ -318,13 +318,23 @@ nnoremap <leader>cd :tcd %:p:h<cr>
 " change filetype
 nnoremap <leader>sq :set filetype=sql<cr>
 
+" force correct spacing around commas
+nnoremap <leader>cs :s/\v\s*,\s*/, /g<cr>
+xnoremap <leader>cs :s/\v\s*,\s*/, /g<cr>
+" nnoremap <leader> :s/\v(\S+)\s{2,}(\S+)/\1 \2/g<cr>
+" nnoremap <leader>cs :s/\s*(=|<=|>=)\s*/, /g<cr>
+" parentheses, operators
+
+" split list with newlines
+nnoremap <silent> <leader>sl :s/\v\s*,\s*/,\r/g \| :normal! V``j=<cr>
+
 " noremap <leader>rt :%retab<cr>
 
 noremap <leader>tw :call TrimWhitespace()<cr>
 
 noremap <silent> <leader>ti :call ToggleInteractiveShell()<cr>
-noremap <silent> <leader>dt :call ToggleDiff()<cr>
-nnoremap <silent> <leader>qt :call QuickfixToggle()
+noremap <silent> <leader>td :call ToggleDiff()<cr>
+nnoremap <silent> <leader>tq :call ToggleQuickfix()<cr>
 
 " open & close terminal buffer
 nnoremap <silent> <leader>ht :terminal<cr>
