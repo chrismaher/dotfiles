@@ -233,6 +233,9 @@ nnoremap <leader>sv :source $MYVIMRC<cr>
 inoremap jk <esc>
 inoremap <esc> <nop>
 
+" 
+nnoremap Y y$
+
 " yank to system clipboard
 noremap <leader>y "*y
 
@@ -269,6 +272,9 @@ nnoremap <silent> <leader>ee :enew<cr>
 nnoremap <leader>sb :vertical sbuffer #<cr>
 nnoremap <leader>bd :bd #<cr>
 nnoremap <silent> <leader>bc :bp\|bd #<cr>
+
+" buffer select
+" nnoremap <leader>bb :ls<cr>:b<space>
 
 " window operations
 nnoremap <silent> <leader>vn :vnew<cr>
@@ -382,7 +388,7 @@ nnoremap <leader>gd :Gdiffsplit!<cr>
 nnoremap <leader>gh :Gbrowse<cr>
 nnoremap <leader>gp :G pull<cr>
 nnoremap <leader>gr :Gread<cr>
-nnoremap <leader>gs :G<cr>
+nnoremap <leader>gg :G<cr>
 nnoremap <leader>gw :Gwrite<cr>
 
 xnoremap <leader>gh :Gbrowse<cr>
