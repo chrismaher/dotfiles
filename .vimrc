@@ -408,6 +408,7 @@ noremap <leader>ut :UndotreeToggle<cr>
 
 " VimWiki
 let g:vimwiki_list = [{ 'path': '~/.wiki/', 'syntax':'markdown', 'ext': '.md' }]
+" autocmd FileType vimwiki let g:vimwiki_list = [{'path': '~/.wiki/', 'syntax': 'markdown', 'ext': '.md'}]
 
 " fzf{{{
 " autocmd! FileType fzf
@@ -576,12 +577,6 @@ if has("autocmd")
     augroup filtetype_vim
         autocmd!
         autocmd FileType vim setlocal foldmethod=marker
-    augroup End"}}}
-
-    " VimWiki{{{
-    augroup filetype_vimwiki
-        autocmd!
-        autocmd FileType vimwiki set ft=markdown
     augroup End"}}}
 
     " YAML{{{
