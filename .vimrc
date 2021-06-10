@@ -35,6 +35,12 @@ endif
 " Keep 200 lines of command history
 set history=200
 
+" vertical diff split
+set diffopt+=vertical
+
+if executable('rg')
+    let grepprg = 'rg --vimgrep'
+endif
 "}}}
 
 " Plugins{{{
@@ -42,11 +48,11 @@ call plug#begin('~/.vim/plugged')
 
 Plug 'christoomey/vim-tmux-navigator'
 
-" Plug 'dense-analysis/ale', { 'for': 'haskell' }
+Plug 'dense-analysis/ale', { 'for': 'haskell' }
 
 Plug 'fatih/vim-go', { 'for': 'go' }
 
-Plug 'git@github-personal:chrismaher/vim-dbt'
+" Plug 'git@github-personal:chrismaher/vim-dbt'
 Plug 'git@github-personal:chrismaher/vim-lookml.git'
 Plug 'git@github-personal:chrismaher/vim-sql-case.git', { 'for': 'sql' }
 
@@ -58,7 +64,7 @@ Plug 'junegunn/fzf.vim'
 
 Plug 'mbbill/undotree'
 
-Plug 'mileszs/ack.vim'
+" Plug 'mileszs/ack.vim'
 
 Plug 'nvie/vim-flake8', { 'for': 'python' }
 
@@ -179,6 +185,12 @@ function! ListLeaders()
     silent! let lines = getline(1,"$")
 endfunction
 
+function! CleanWhitespace()
+    silent! %s/\s\+,/,/g
+    silent! %s/\(\w\)\s\+\(\w\)/\1 \2/g
+endfunction
+nnoremap <leader><tab> :call CleanWhitespace()<cr> 
+
 function! ToggleInteractiveShell()
     " toggle to make vim’s :! shell
     " behave like interactive shell
@@ -236,6 +248,19 @@ inoremap <esc> <nop>
 " 
 nnoremap Y y$
 
+" 
+nnoremap _ ddp
+
+"
+nnoremap <leader>hi :set hidden!<cr>
+
+" start a search
+nnoremap <space>s :s/
+nnoremap <space><space> :%s/
+
+" 
+" mapping to flip horizontal to vertical
+
 " yank to system clipboard
 noremap <leader>y "*y
 
@@ -255,10 +280,10 @@ nnoremap <leader>ad :argdelete #<cr>
 nnoremap <silent> <leader>- :edit!<cr>
 
 " vim exits
-noremap <leader>w :w<cr>
+noremap <space>w :w<cr>
 noremap <leader>W :wa<cr>
-noremap <leader>q :q<cr>
-noremap <leader>Q :qa<cr>
+noremap <space>q :q<cr>
+noremap <leader>q :qa<cr>
 noremap <leader>x :q!<cr>
 noremap <leader>X :qa!<cr>
 
@@ -266,41 +291,50 @@ noremap <leader>X :qa!<cr>
 nnoremap <leader>af :first<cr>
 
 " new buffer
-nnoremap <silent> <leader>ee :enew<cr>
+nnoremap <silent> <space>e :enew<cr>
 
 " alternate buffer mappings
-nnoremap <leader>sb :vertical sbuffer #<cr>
-nnoremap <leader>bd :bd #<cr>
+nnoremap <space>v :vertical sbuffer #<cr>
+nnoremap <space>d :bd #<cr>
 nnoremap <silent> <leader>bc :bp\|bd #<cr>
 
 " buffer select
 " nnoremap <leader>bb :ls<cr>:b<space>
 
+" start :Z command
+nnoremap <space>z :Z<space>
+
 " window operations
-nnoremap <silent> <leader>vn :vnew<cr>
+nnoremap <silent> <space>n :vnew<cr>
+nnoremap <silent> <leader>wh <c-w>t<c-w>K
+nnoremap <silent> <leader>wv <c-w>t<c-w>H
 nnoremap <silent> <leader>wr <c-w>R
 nnoremap <silent> <leader>wt <c-w>T
 nnoremap <silent> <leader>wo <c-w>o
-nnoremap <silent> <leader>o :only<cr>
+nnoremap <silent> <space>o :only<cr>
 
 " tab operations
-nnoremap <silent> <leader>tt :tabedit<cr>
+nnoremap <silent> <space>t :tabedit<cr>
 nnoremap <silent> <leader>tq :tabclose<cr>
+
 nnoremap <silent> ]t :tabnext<cr>
 nnoremap <silent> [t :tabprevious<cr>
+nnoremap <silent> <space>] :tabnext<cr>
+nnoremap <silent> <space>[ :tabprevious<cr>
+
 nnoremap <silent> <leader>] :tabmove +1<cr>
 nnoremap <silent> <leader>[ :tabmove -1<cr>
 nnoremap <silent> <leader>tf :tabfirst<cr>
 nnoremap <silent> <leader>tl :tablast<cr>
-nnoremap <silent> <leader>1 1gt
-nnoremap <silent> <leader>2 2gt
-nnoremap <silent> <leader>3 3gt
-nnoremap <silent> <leader>4 4gt
-nnoremap <silent> <leader>5 5gt
-nnoremap <silent> <leader>6 6gt
-nnoremap <silent> <leader>7 7gt
-nnoremap <silent> <leader>8 8gt
-nnoremap <silent> <leader>9 9gt
+nnoremap <silent> <space>1 1gt
+nnoremap <silent> <space>2 2gt
+nnoremap <silent> <space>3 3gt
+nnoremap <silent> <space>4 4gt
+nnoremap <silent> <space>5 5gt
+nnoremap <silent> <space>6 6gt
+nnoremap <silent> <space>7 7gt
+nnoremap <silent> <space>8 8gt
+nnoremap <silent> <space>9 9gt
 
 " operations on pasted text
 nnoremap <leader>vp `[v`]
@@ -318,8 +352,8 @@ nnoremap <leader>" viw<esc>a"<esc>bi"<esc>lel
 nnoremap <leader>' viw<esc>a'<esc>bi'<esc>lel
 
 " change directory
-nnoremap <leader>up :tcd ..<cr>
-nnoremap <leader>cd :tcd %:p:h<cr>
+nnoremap <silent> <leader>up :tcd ..<cr>
+nnoremap <silent> <leader>cd :tcd %:p:h<cr>
 
 " change filetype
 nnoremap <leader>sq :set filetype=sql<cr>
@@ -341,6 +375,7 @@ noremap <leader>tw :call TrimWhitespace()<cr>
 noremap <silent> <leader>ti :call ToggleInteractiveShell()<cr>
 noremap <silent> <leader>td :call ToggleDiff()<cr>
 nnoremap <silent> <leader>tq :call ToggleQuickfix()<cr>
+nnoremap <silent> <leader>ts :if exists("g:syntax_on") <bar> syntax off <bar> else <bar> syntax enable <bar> endif <cr>
 
 " open & close terminal buffer
 nnoremap <silent> <leader>ht :terminal<cr>
@@ -369,12 +404,10 @@ inoremap <C-K> <Up>
 "}}}
 
 " Plugin Settings & Mappings{{{
-
-" Ack
-if executable('rg')
-    let g:ackprg = 'rg --vimgrep'
-endif
-nnoremap <leader>ac :Ack <cword><cr>
+" Ale
+let g:ale_linters = {
+    \   'haskell': ['stack-ghc', 'hlint', 'hdevtools', 'hfmt'],
+    \}
 
 " EasyAlign
 " Start interactive EasyAlign in visual mode (e.g. vipga)
@@ -384,18 +417,26 @@ nmap ga <Plug>(EasyAlign)
 
 " Fugitive
 nnoremap <leader>gb :Gblame<cr>
+nnoremap <leader>pu :G pull<cr>
+nnoremap <leader>po :G push origin HEAD<cr>
+nnoremap <leader>ci :Gcommit<cr>
+nnoremap <leader>co :G co<space>
 nnoremap <leader>gd :Gdiffsplit!<cr>
 nnoremap <leader>gh :Gbrowse<cr>
-nnoremap <leader>gp :G pull<cr>
 nnoremap <leader>gr :Gread<cr>
-nnoremap <leader>gg :G<cr>
 nnoremap <leader>gw :Gwrite<cr>
+nnoremap <space>g :G<cr>
 
 xnoremap <leader>gh :Gbrowse<cr>
 xnoremap <leader>gb :Gblame<cr>
 
+" same bindings for merging diffs as in normal mode
+xnoremap <leader>dp :diffput<cr>
+xnoremap <leader>do :diffget<cr>
+
 " GV
 noremap <leader>gv :GV<cr>
+noremap <leader>gV :GV!<cr>
 
 " NERDTree
 noremap <leader>nt :NERDTreeToggle<cr>
@@ -408,6 +449,7 @@ noremap <leader>ut :UndotreeToggle<cr>
 
 " VimWiki
 let g:vimwiki_list = [{ 'path': '~/.wiki/', 'syntax':'markdown', 'ext': '.md' }]
+nnoremap <leader>wx :VimwikiToggleListItem<cr>
 " autocmd FileType vimwiki let g:vimwiki_list = [{'path': '~/.wiki/', 'syntax': 'markdown', 'ext': '.md'}]
 
 " fzf{{{
@@ -419,17 +461,6 @@ let g:vimwiki_list = [{ 'path': '~/.wiki/', 'syntax':'markdown', 'ext': '.md' }]
 " else
   " let g:fzf_layout = { 'window': { 'width': 0.9, 'height': 0.6 } }
 " endif
-
-" nnoremap <silent> <expr> <Leader><Leader> (expand('%') =~ 'NERD_tree' ? "\<c-w>\<c-w>" : '').":Files\<cr>"
-" nnoremap <silent> <Leader>C        :Colors<CR>
-" nnoremap <silent> <Leader><Enter>  :Buffers<CR>
-" nnoremap <silent> <Leader>L        :Lines<CR>
-" nnoremap <silent> <Leader>ag       :Ag <C-R><C-W><CR>
-" nnoremap <silent> <Leader>AG       :Ag <C-R><C-A><CR>
-" xnoremap <silent> <Leader>ag       y:Ag <C-R>"<CR>
-" nnoremap <silent> <Leader>`        :Marks<CR>
-" nnoremap <silent> q: :History:<CR>
-" nnoremap <silent> q/ :History/<CR>
 
 " inoremap <expr> <c-x><c-t> fzf#complete('tmuxwords.rb --all-but-current --scroll 500 --min 5')
 " imap <c-x><c-k> <plug>(fzf-complete-word)
@@ -460,6 +491,9 @@ let g:vimwiki_list = [{ 'path': '~/.wiki/', 'syntax':'markdown', 'ext': '.md' }]
   " \ 'sink':   function('s:plug_help_sink')}))
 
 " from https://github.com/junegunn/fzf.vim
+
+let g:fzf_layout = { 'down': '40%' }
+
 function! RipgrepFzf(query, fullscreen)
   let command_fmt = 'rg --column --line-number --no-heading --color=always --smart-case %s || true'
   let initial_command = printf(command_fmt, shellescape(a:query))
@@ -473,17 +507,33 @@ endfunction
 
 command! -nargs=* -bang RG call RipgrepFzf(<q-args>, <bang>0)
 
-nnoremap <silent> <leader>f :Files<CR>
-nnoremap <silent> <leader>F :GFiles<CR>
-nnoremap <silent> <leader>b :Buffers<CR>
-nnoremap <silent> <leader>h :History<CR>
-nnoremap <silent> <leader>l :BLines<CR>
-nnoremap <silent> <leader>L :Lines<CR>
-nnoremap <silent> <leader>' :Marks<CR>
-nnoremap <silent> <leader>/ :Rg<CR>
-" nnoremap <silent> <leader>C :Commits<CR>
-nnoremap <silent> <leader>C :Commands<CR>
-nnoremap <silent> <leader>H :Helptags<CR>
+" nnoremap <silent> <expr> <Leader><Leader> (expand('%') =~ 'NERD_tree' ? "\<c-w>\<c-w>" : '').":Files\<cr>"
+" nnoremap <silent> <Leader>C        :Colors<CR>
+" nnoremap <silent> <Leader><Enter>  :Buffers<CR>
+" nnoremap <silent> <Leader>L        :Lines<CR>
+" nnoremap <silent> <Leader>ag       :Ag <C-R><C-W><CR>
+" nnoremap <silent> <Leader>AG       :Ag <C-R><C-A><CR>
+" xnoremap <silent> <Leader>ag       y:Ag <C-R>"<CR>
+" nnoremap <silent> <Leader>`        :Marks<CR>
+" nnoremap <silent> q: :History:<CR>
+" nnoremap <silent> q/ :History/<CR>
+
+function s:fzfcheckout(branch)
+    execute 'Git checkout ' . substitute(a:branch, '\s\+', '', -1)
+endfunction
+nnoremap <silent> <space>c :call fzf#run(fzf#wrap({'source': 'git branch', 'sink': function('<SID>fzfcheckout')}))<CR>
+
+nnoremap <silent> <space>b :Buffers<CR>
+nnoremap <silent> <space>f :Files<CR>
+nnoremap <silent> <space>F :GFiles<CR>
+nnoremap <silent> <space>r :Rg<CR>
+nnoremap <silent> <space>h :Helptags<CR>
+nnoremap <silent> <space>l :BLines<CR>
+nnoremap <silent> <space>L :Lines<CR>
+" nnoremap <silent> <space><space> :History<CR>
+nnoremap <silent> <space>: :History:<CR>
+nnoremap <silent> <space>/ :History/<CR>
+nnoremap <silent> <space>' :Marks<CR>
 "}}}
 "}}}
 
@@ -540,6 +590,12 @@ if has("autocmd")
 
     augroup END"}}}
 
+    " Haskell{{{
+    augroup filetype_haskell
+        autocmd!
+        autocmd FileType haskell set formatprg=stylish-haskell
+    augroup END"}}}
+
     " Help{{{
     augroup filetype_help
         autocmd!
@@ -571,6 +627,8 @@ if has("autocmd")
     augroup filetype_sql
         autocmd!
         autocmd FileType sql nmap <leader>sc <Plug>(sql-case)
+        autocmd FileType sql setlocal foldmethod=indent
+        autocmd FileType sql setlocal commentstring=--\ %s
     augroup END"}}}
 
     " Vimscript{{{

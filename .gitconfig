@@ -2,11 +2,13 @@
 	ap = add -p
 	au = add -u
 	br = branch
+	ca = commit --amend --no-edit
 	cb = checkout -b
 	ci = commit
 	co = checkout
 	cp = cherry-pick
 	dc = diff --cached
+	dn = diff --name-only
 	dt = difftool
 	dw = diff -w
 	ed = !vim $(git status -s | awk '{print $2}')
@@ -14,6 +16,9 @@
 	lg = log --graph --pretty=logfmt --abbrev-commit --date=relative
 	ls = log --pretty=logfmt
 	pf = push --force-with-lease
+	po = push origin HEAD
+	pu = pull
+    rl = reflog
 	sl = stash list --date=local
 	sp = "!f() { git stash pop stash@{${1:-0}} ; }; f"
 	ss = "!f() { git stash show stash@{${1:-0}} ; }; f"
@@ -45,3 +50,6 @@
 	prompt = false
 [commit]
 	verbose = true
+[user]
+	name = chrismaher
+	email = chrismaher37@gmail.com

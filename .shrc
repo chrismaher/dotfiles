@@ -32,6 +32,7 @@ alias cp="cp -i"
 alias lsd="ls -1d */"
 alias lsr="ls -ltr"
 alias lss="ls -lShr"
+alias mkdir="mkdir -p"
 alias mv="mv -i"
 alias wcl="wc -l"
 
@@ -44,8 +45,11 @@ alias zshrc='vim $HOME/.zshrc'
 # Python
 alias rmpyc='find . -type d -name '__pycache__' -exec rm -rf {} \;'
 alias venv='source $HOME/venv/bin/activate'
+alias pd='venv && python -ic "import pandas as pd"'
 
-alias vpaste="pbpaste | vim -"
+alias vp="pbpaste | vim -"
+
+# stack exec ghc-pkg -- list
 
 # tmux
 alias tat="tmux a -t"
@@ -72,4 +76,9 @@ untargz () {
 # LookML utils
 sql () {
     gsed '/sql:/,/;;/!d;/;;/q' "$1" | gsed '1d; $d'
+}
+
+vf () {
+    fzf_output=("${(@f)$(fzf --height 40% --border --reverse -m)}")
+    [[ -n "${fzf_output}" ]] && vim "${fzf_output[@]}"
 }
