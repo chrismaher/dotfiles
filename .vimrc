@@ -337,10 +337,11 @@ nnoremap <silent> <space>8 8gt
 nnoremap <silent> <space>9 9gt
 
 " operations on pasted text
-nnoremap <leader>vp `[v`]
-nnoremap <leader>v= `[v`]=
-nnoremap <leader>< V`]<
-nnoremap <leader>> V`]>
+nnoremap gp `[v`]
+" how to make these work?
+" nnoremap <leader>v= `[v`]=
+" nnoremap <leader>< V`]<
+" nnoremap <leader>> V`]>
 
 " change matches with cgn, starting with the word under the cursor
 nnoremap <silent> <leader>cw :let @/=expand('<cword>')<cr>cgn
@@ -417,6 +418,7 @@ nmap ga <Plug>(EasyAlign)
 
 " Fugitive
 nnoremap <leader>gb :Gblame<cr>
+nnoremap <leader>gf :G fetch<cr>
 nnoremap <leader>pu :G pull<cr>
 nnoremap <leader>po :G push origin HEAD<cr>
 nnoremap <leader>ci :Gcommit<cr>
@@ -615,6 +617,7 @@ if has("autocmd")
         autocmd!
         autocmd FileType python setlocal textwidth=79
         autocmd FileType python set fileformat=unix
+        autocmd FileType python nnoremap <leader>f8 :call flake8#Flake8()<CR>
     augroup END"}}}
 
     " Shell{{{
