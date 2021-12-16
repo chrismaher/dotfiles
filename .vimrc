@@ -52,8 +52,10 @@ Plug 'dense-analysis/ale', { 'for': 'haskell' }
 
 Plug 'fatih/vim-go', { 'for': 'go' }
 
+" note: the filetype check here is breaking Gdiff*
 " Plug 'git@github-personal:chrismaher/vim-dbt'
 Plug 'git@github-personal:chrismaher/vim-lookml.git'
+Plug 'git@github-personal:chrismaher/sqlfluff.vim.git'
 Plug 'git@github-personal:chrismaher/vim-sql-case.git', { 'for': 'sql' }
 
 Plug 'junegunn/vim-easy-align'
@@ -66,7 +68,7 @@ Plug 'mbbill/undotree'
 
 " Plug 'mileszs/ack.vim'
 
-Plug 'nvie/vim-flake8', { 'for': 'python' }
+Plug 'nvie/vim-flake8'
 
 Plug 'preservim/nerdtree'
 
@@ -417,11 +419,11 @@ xmap ga <Plug>(EasyAlign)
 nmap ga <Plug>(EasyAlign)
 
 " Fugitive
-nnoremap <leader>gb :Gblame<cr>
+nnoremap <leader>gb :G blame<cr>
 nnoremap <leader>gf :G fetch<cr>
 nnoremap <leader>pu :G pull<cr>
 nnoremap <leader>po :G push origin HEAD<cr>
-nnoremap <leader>ci :Gcommit<cr>
+nnoremap <leader>ci :G commit<cr>
 nnoremap <leader>co :G co<space>
 nnoremap <leader>gd :Gdiffsplit!<cr>
 nnoremap <leader>gh :Gbrowse<cr>
@@ -439,6 +441,9 @@ xnoremap <leader>do :diffget<cr>
 " GV
 noremap <leader>gv :GV<cr>
 noremap <leader>gV :GV!<cr>
+
+" Rhubarb
+nnoremap <leader>pr :G hub pull-request<cr>
 
 " NERDTree
 noremap <leader>nt :NERDTreeToggle<cr>
@@ -520,10 +525,11 @@ command! -nargs=* -bang RG call RipgrepFzf(<q-args>, <bang>0)
 " nnoremap <silent> q: :History:<CR>
 " nnoremap <silent> q/ :History/<CR>
 
-function s:fzfcheckout(branch)
-    execute 'Git checkout ' . substitute(a:branch, '\s\+', '', -1)
-endfunction
-nnoremap <silent> <space>c :call fzf#run(fzf#wrap({'source': 'git branch', 'sink': function('<SID>fzfcheckout')}))<CR>
+" fzf for branches
+nnoremap <silent> <space>c :call fzf#run(fzf#wrap({'source': 'git branch', 'sink': function({arg -> execute('Git checkout ' . substitute(arg, '\s\+', '', -1))})}))<CR>
+
+" fzf for pull requests
+nnoremap <silent> <space>p :call fzf#run(fzf#wrap({'source': 'gh pr list', 'sink': function({arg -> execute('G gh pr checkout ' . substitute(arg, '\s\+.*', '', -1))})}))<CR>
 
 nnoremap <silent> <space>b :Buffers<CR>
 nnoremap <silent> <space>f :Files<CR>
@@ -595,7 +601,9 @@ if has("autocmd")
     " Haskell{{{
     augroup filetype_haskell
         autocmd!
-        autocmd FileType haskell set formatprg=stylish-haskell
+        " autocmd FileType haskell set formatprg=stylish-haskell
+        autocmd FileType haskell nnoremap <leader>b :! stack ghc -- %<CR>
+        autocmd FileType haskell nnoremap <leader>r :! runhaskell %<CR>
     augroup END"}}}
 
     " Help{{{
@@ -630,6 +638,7 @@ if has("autocmd")
     augroup filetype_sql
         autocmd!
         autocmd FileType sql nmap <leader>sc <Plug>(sql-case)
+        autocmd FileType sql nmap <leader>sf <plug>(sqlfluff-lint)
         autocmd FileType sql setlocal foldmethod=indent
         autocmd FileType sql setlocal commentstring=--\ %s
     augroup END"}}}
