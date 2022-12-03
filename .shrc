@@ -49,8 +49,6 @@ alias pd='venv && python -ic "import pandas as pd"'
 
 alias vp="pbpaste | vim -"
 
-# stack exec ghc-pkg -- list
-
 # tmux
 alias tat="tmux a -t"
 alias tns="tmux new -s"
