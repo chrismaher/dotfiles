@@ -141,10 +141,6 @@ untargz () {
     tar -zxvf "$1" -C "$target"
 }
 
-last_command () {
-    fc -ln "$1" "$1" | sed '1s/^[[:space:]]*//' | tr -d '\n' | pbcopy
-}
-
 body () {
     IFS= read -r header
     printf '%s\n' "$header"

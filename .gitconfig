@@ -2,24 +2,34 @@
 	ap = add -p
 	au = add -u
 	br = branch
+	ca = commit --amend --no-edit
 	cb = checkout -b
-	ci = commit -v
+	ci = commit
 	co = checkout
 	cp = cherry-pick
 	dc = diff --cached
+	dn = diff --name-only
 	dt = difftool
 	dw = diff -w
 	ed = !vim $(git status -s | awk '{print $2}')
+	fe = fetch
 	lb = for-each-ref --sort=committerdate refs/heads/ --format='%(committerdate:short) %(refname:short)'
 	lg = log --graph --pretty=logfmt --abbrev-commit --date=relative
 	ls = log --pretty=logfmt
 	pf = push --force-with-lease
+	po = push origin HEAD
+	pu = pull
+	rl = reflog
 	sl = stash list --date=local
 	sp = "!f() { git stash pop stash@{${1:-0}} ; }; f"
 	ss = "!f() { git stash show stash@{${1:-0}} ; }; f"
 	st = status
 	sh = show --name-status --pretty=short --abbrev-commit
 	um = "!git ls-files -u | cut -f 2 | sort -u" # git diff --name-only --diff-filter=U
+	mt = mergetool
+	gh = !gh
+	hub = !hub
+	bd = branch -d
 [core]
 	editor = vim
 	excludesFile = ~/.gitignore
@@ -38,3 +48,9 @@
 	ff = only
 [pretty]
 	logfmt = %Cred%h%Creset%C(yellow)%d%Creset %s %Cblue(%an)%Creset %Cgreen(%cr)%Creset
+[merge]
+	tool = vimdiff
+[mergetool]
+	prompt = false
+[commit]
+	verbose = true
