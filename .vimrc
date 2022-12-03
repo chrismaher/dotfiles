@@ -48,7 +48,7 @@ call plug#begin('~/.vim/plugged')
 
 Plug 'christoomey/vim-tmux-navigator'
 
-Plug 'dense-analysis/ale', { 'for': 'haskell' }
+" Plug 'dense-analysis/ale', { 'for': 'haskell' }
 
 Plug 'fatih/vim-go', { 'for': 'go' }
 
@@ -58,13 +58,13 @@ Plug 'git@github-personal:chrismaher/vim-lookml.git'
 Plug 'git@github-personal:chrismaher/sqlfluff.vim.git'
 Plug 'git@github-personal:chrismaher/vim-sql-case.git', { 'for': 'sql' }
 
-Plug 'junegunn/vim-easy-align'
+" Plug 'junegunn/vim-easy-align'
 Plug 'junegunn/vader.vim'
 Plug 'junegunn/gv.vim'
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
 
-Plug 'mbbill/undotree'
+" Plug 'mbbill/undotree'
 
 " Plug 'mileszs/ack.vim'
 
@@ -86,38 +86,70 @@ call plug#end()"}}}
 
 " Functions{{{
 " tabline
-function MyTabLabel(n)
+function TabLabel(n)
     return fnamemodify(getcwd(tabpagewinnr(a:n), a:n), ':~')
 endfunction
 
-function! MyTabLine()
-    let s = ''
+function! TabLine()
+    let l:tabline = ''
     for i in range(tabpagenr('$'))
-    " select the highlighting
+        " select the highlighting
         if i + 1 == tabpagenr()
-            let s .= '%#TabLineSel#'
+            let l:tabline .= '%#TabLineSel#'
         else
-            let s .= '%#TabLine#'
+            let l:tabline .= '%#TabLine#'
         endif
 
-        " set the tab page number (for mouse clicks)
-        let s .= '%' . (i + 1) . 'T'
+        " set the tab page number
+        let l:tabline .= '%' . (i + 1) . 'T'
 
-        " the label is made by MyTabLabel()
-        let s .= ' %{MyTabLabel(' . (i + 1) . ')} '
+        " the label is made by TabLabel
+        let l:tabline .= ' %{TabLabel(' . (i + 1) . ')} '
     endfor
 
     " after the last tab fill with TabLineFill and reset tab page nr
-    let s .= '%#TabLineFill#%T'
+    let l:tabline .= '%#TabLineFill#%T'
 
     " right-align the label to close the current tab page
     if tabpagenr('$') > 1
-        let s .= '%=%#TabLine#%999Xclose'
+        let l:tabline .= '%=%#TabLine#%999Xclose'
     endif
 
-    return s
-endfun
-set tabline=%!MyTabLine()
+    return l:tabline
+endfunction
+
+set tabline=%!TabLine()
+
+"
+function! ToggleQuickfix()
+    let l:quickfix = filter(getwininfo(), 'v:val.quickfix')
+    if empty(l:quickfix)
+        " execute 'copen' . exists("w:quickfix_height") ? ' ' . w:quickfix_height : ''
+        execute 'copen ' . get(w:, 'quickfix_height', '')
+    else
+        let w:quickfix_height = l:quickfix[0].height
+        cclose
+    endif
+endfunction
+
+" delete all buffers that aren't in a window or changed
+function! CleanBufferList()
+    let _hidden = &hidden
+    set nohidden
+
+    let bufs = getbufinfo()
+    let delnum = 0
+    for buf in bufs
+        if buf.listed == 1 && empty(buf.windows) && buf.changed == 0
+            exec 'bdelete ' .  buf.bufnr
+            let delnum += 1
+        endif
+    endfor
+
+    let &hidden = _hidden
+
+    echo "Deleted " . delnum . " buffers"
+endfunction
 
 " trim trailing whitespace
 function! TrimWhitespace()
@@ -163,17 +195,6 @@ function! ToggleDiff()
     endif
 endfunction
 
-let g:quickfix_is_open = 0
-function! ToggleQuickfix()
-    if g:quickfix_is_open
-        cclose
-        let g:quickfix_is_open = 0
-    else
-        copen
-        let g:quickfix_is_open = 1
-    endif
-endfunction
-
 function! ListLeaders()
     silent! redir @a
     silent! nmap <leader>
@@ -191,7 +212,7 @@ function! CleanWhitespace()
     silent! %s/\s\+,/,/g
     silent! %s/\(\w\)\s\+\(\w\)/\1 \2/g
 endfunction
-nnoremap <leader><tab> :call CleanWhitespace()<cr> 
+nnoremap <leader><tab> :call CleanWhitespace()<cr>
 
 function! ToggleInteractiveShell()
     " toggle to make vim’s :! shell
@@ -247,21 +268,24 @@ nnoremap <leader>sv :source $MYVIMRC<cr>
 inoremap jk <esc>
 inoremap <esc> <nop>
 
-" 
+" make Y behave like C and D
 nnoremap Y y$
 
-" 
+" shift line downward
 nnoremap _ ddp
 
-"
+" toggle hidden
 nnoremap <leader>hi :set hidden!<cr>
 
 " start a search
 nnoremap <space>s :s/
 nnoremap <space><space> :%s/
 
-" 
+" mapping to flip vertical to horizontal
+nnoremap <leader>hf <c-w>t<c-w>K
+
 " mapping to flip horizontal to vertical
+nnoremap <leader>vf <c-w>t<c-w>H
 
 " yank to system clipboard
 noremap <leader>y "*y
@@ -278,10 +302,10 @@ nnoremap <leader>aa :argadd<cr>
 " delete the previous argument
 nnoremap <leader>ad :argdelete #<cr>
 
-" reset buffer
+" reread buffer from file
 nnoremap <silent> <leader>- :edit!<cr>
 
-" vim exits
+" vim writes & exits
 noremap <space>w :w<cr>
 noremap <leader>W :wa<cr>
 noremap <space>q :q<cr>
@@ -319,13 +343,15 @@ nnoremap <silent> <space>o :only<cr>
 nnoremap <silent> <space>t :tabedit<cr>
 nnoremap <silent> <leader>tq :tabclose<cr>
 
-nnoremap <silent> ]t :tabnext<cr>
-nnoremap <silent> [t :tabprevious<cr>
+" nnoremap <silent> ]t :tabnext<cr>
+" nnoremap <silent> [t :tabprevious<cr>
 nnoremap <silent> <space>] :tabnext<cr>
 nnoremap <silent> <space>[ :tabprevious<cr>
 
-nnoremap <silent> <leader>] :tabmove +1<cr>
-nnoremap <silent> <leader>[ :tabmove -1<cr>
+" nnoremap <silent> <leader>] :tabmove +1<cr>
+" nnoremap <silent> <leader>[ :tabmove -1<cr>
+nnoremap <silent> ]t :tabmove +1<cr>
+nnoremap <silent> [t :tabmove -1<cr>
 nnoremap <silent> <leader>tf :tabfirst<cr>
 nnoremap <silent> <leader>tl :tablast<cr>
 nnoremap <silent> <space>1 1gt
@@ -355,6 +381,7 @@ nnoremap <leader>" viw<esc>a"<esc>bi"<esc>lel
 nnoremap <leader>' viw<esc>a'<esc>bi'<esc>lel
 
 " change directory
+" these isn't useful...
 nnoremap <silent> <leader>up :tcd ..<cr>
 nnoremap <silent> <leader>cd :tcd %:p:h<cr>
 
@@ -373,8 +400,10 @@ nnoremap <silent> <leader>sl :s/\v\s*,\s*/,\r/g \| :normal! V``j=<cr>
 
 " noremap <leader>rt :%retab<cr>
 
+nnoremap <leader>cb :call CleanBufferList()<cr>
 noremap <leader>tw :call TrimWhitespace()<cr>
 
+" toggle mappings
 noremap <silent> <leader>ti :call ToggleInteractiveShell()<cr>
 noremap <silent> <leader>td :call ToggleDiff()<cr>
 nnoremap <silent> <leader>tq :call ToggleQuickfix()<cr>
@@ -408,17 +437,26 @@ inoremap <C-K> <Up>
 
 " Plugin Settings & Mappings{{{
 " Ale
-let g:ale_linters = {
-    \   'haskell': ['stack-ghc', 'hlint', 'hdevtools', 'hfmt'],
-    \}
+" let g:ale_linters = {
+"     \   'haskell': ['stack-ghc', 'hlint', 'hdevtools', 'hfmt'],
+"     \}
 
-" EasyAlign
-" Start interactive EasyAlign in visual mode (e.g. vipga)
-xmap ga <Plug>(EasyAlign)
-" Start interactive EasyAlign for a motion/text object (e.g. gaip)
-nmap ga <Plug>(EasyAlign)
+" " EasyAlign
+" " Start interactive EasyAlign in visual mode (e.g. vipga)
+" xmap ga <Plug>(EasyAlign)
+" " Start interactive EasyAlign for a motion/text object (e.g. gaip)
+" nmap ga <Plug>(EasyAlign)
 
 " Fugitive
+" function! ToggleBlame()
+"     if &l:filetype ==# 'fugitiveblame'
+"         close
+"     else
+"         :G blame<CR>
+"     endif
+" endfunction
+" nnoremap gb :call <SID>ToggleBlame()<CR>
+
 nnoremap <leader>gb :G blame<cr>
 nnoremap <leader>gf :G fetch<cr>
 nnoremap <leader>pu :G pull<cr>
@@ -463,11 +501,8 @@ nnoremap <leader>wx :VimwikiToggleListItem<cr>
 " autocmd! FileType fzf
 " autocmd  FileType fzf set noshowmode noruler nonu
 
-" if exists('$TMUX')
-  " let g:fzf_layout = { 'tmux': '-p90%,60%' }
-" else
-  " let g:fzf_layout = { 'window': { 'width': 0.9, 'height': 0.6 } }
-" endif
+" make fzf open in a tmux popup window
+" https://github.com/junegunn/fzf/blob/master/README-VIM.md#starting-fzf-in-a-popup-window
 
 " inoremap <expr> <c-x><c-t> fzf#complete('tmuxwords.rb --all-but-current --scroll 500 --min 5')
 " imap <c-x><c-k> <plug>(fzf-complete-word)
@@ -480,68 +515,33 @@ nnoremap <leader>wx :VimwikiToggleListItem<cr>
 " xmap <leader><tab> <plug>(fzf-maps-x)
 " omap <leader><tab> <plug>(fzf-maps-o)
 
-" function! s:plug_help_sink(line)
-  " let dir = g:plugs[a:line].dir
-  " for pat in ['doc/*.txt', 'README.md']
-    " let match = get(split(globpath(dir, pat), "\n"), 0, '')
-    " if len(match)
-      " execute 'tabedit' match
-      " return
-    " endif
-  " endfor
-  " tabnew
-  " execute 'Explore' dir
-" endfunction
-
-" command! PlugHelp call fzf#run(fzf#wrap({
-  " \ 'source': sort(keys(g:plugs)),
-  " \ 'sink':   function('s:plug_help_sink')}))
-
-" from https://github.com/junegunn/fzf.vim
+" Browse help files and README.md:
+" https://github.com/junegunn/vim-plug/wiki/extra#browse-help-files-and-readmemd
 
 let g:fzf_layout = { 'down': '40%' }
 
-function! RipgrepFzf(query, fullscreen)
-  let command_fmt = 'rg --column --line-number --no-heading --color=always --smart-case %s || true'
-  let initial_command = printf(command_fmt, shellescape(a:query))
-  let reload_command = printf(command_fmt, '{q}')
-  let options = {'options': ['--phony', '--query', a:query, '--bind', 'change:reload:'.reload_command]}
-  if a:fullscreen
-    let options = fzf#vim#with_preview(options)
-  endif
-  call fzf#vim#grep(initial_command, 1, options, a:fullscreen)
-endfunction
-
-command! -nargs=* -bang RG call RipgrepFzf(<q-args>, <bang>0)
+" ignore filename when fzf searches rg output
+" https://stackoverflow.com/questions/59885329/how-to-exclude-file-name-from-fzf-filtering-after-ripgrep-search-results
+command! -bang -nargs=* RG call fzf#vim#grep("rg --column --line-number --no-heading --color=always --smart-case ".shellescape(<q-args>), 1, {'options': '--delimiter : --nth 4..'}, <bang>0)
 
 " nnoremap <silent> <expr> <Leader><Leader> (expand('%') =~ 'NERD_tree' ? "\<c-w>\<c-w>" : '').":Files\<cr>"
-" nnoremap <silent> <Leader>C        :Colors<CR>
-" nnoremap <silent> <Leader><Enter>  :Buffers<CR>
-" nnoremap <silent> <Leader>L        :Lines<CR>
-" nnoremap <silent> <Leader>ag       :Ag <C-R><C-W><CR>
-" nnoremap <silent> <Leader>AG       :Ag <C-R><C-A><CR>
-" xnoremap <silent> <Leader>ag       y:Ag <C-R>"<CR>
-" nnoremap <silent> <Leader>`        :Marks<CR>
-" nnoremap <silent> q: :History:<CR>
-" nnoremap <silent> q/ :History/<CR>
 
 " fzf for branches
 nnoremap <silent> <space>c :call fzf#run(fzf#wrap({'source': 'git branch', 'sink': function({arg -> execute('Git checkout ' . substitute(arg, '\s\+', '', -1))})}))<CR>
 
 " fzf for pull requests
-nnoremap <silent> <space>p :call fzf#run(fzf#wrap({'source': 'gh pr list', 'sink': function({arg -> execute('G gh pr checkout ' . substitute(arg, '\s\+.*', '', -1))})}))<CR>
+nnoremap <silent> <space>p :call fzf#run(fzf#wrap({'source': 'gh pr list --json number,title --template '.shellescape('{{range .}}{{tablerow (printf "#%v" .number \| color "green") .title}}{{end}}'), 'sink': function({arg -> execute('G gh pr checkout ' . substitute(arg, '\s\+.*', '', -1))}), 'options': '--ansi'}))<CR>
 
 nnoremap <silent> <space>b :Buffers<CR>
 nnoremap <silent> <space>f :Files<CR>
 nnoremap <silent> <space>F :GFiles<CR>
-nnoremap <silent> <space>r :Rg<CR>
+nnoremap <silent> <space>r :RG<CR>
 nnoremap <silent> <space>h :Helptags<CR>
 nnoremap <silent> <space>l :BLines<CR>
 nnoremap <silent> <space>L :Lines<CR>
-" nnoremap <silent> <space><space> :History<CR>
-nnoremap <silent> <space>: :History:<CR>
+nnoremap <silent> <space>; :History:<CR>
 nnoremap <silent> <space>/ :History/<CR>
-nnoremap <silent> <space>' :Marks<CR>
+" nnoremap <silent> <space>' :Marks<CR>
 "}}}
 "}}}
 
